@@ -1,0 +1,64 @@
+body, table {
+  font-family: consolas,"courier new",monospace;
+  font-size: 12px;
+}
+table {
+  width: 100%;
+}
+
+.hbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.vbox {
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  background: #fff;
+  border: solid 1px rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  padding: 0 5px;
+  margin: 1px;
+  height: 28px;
+  outline: none;
+}
+input[type=button] {
+  cursor: pointer;
+}
+input[type=text]:focus{
+  border-color: #4d90fe;
+}
+input:active {
+  border-color: rgba(0, 0, 0, 0.3);
+}
+input[type=text] {
+  flex: 1;
+  margin-left: 5px;
+}
+
+tbody tr {
+  cursor: pointer;
+}
+tbody tr:nth-child(odd) {
+  background-color: #f1f1f1;
+}
+
+td:first-child,
+td:last-child {
+  width: 1px;
+  white-space: nowrap;
+}
+td:last-child {
+  text-align: center;
+}
+td:last-child input {
+  font-family: "fontello";
+}
+
+#profiles tbody tr:first-child,
+#rules tbody tr:first-child {
+  display: none;
+}

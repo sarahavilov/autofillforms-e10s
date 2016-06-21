@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Settings - AutoFill Forms</title>
+    <link rel="stylesheet" href="fontello.css">
+    <link rel="stylesheet" href="index.css">
+    <link rel="shortcut icon" href="../icons/32.png">
+  </head>
+  <body>
+    <div>
+      <h1>General Settings</h1>
+      <div class="hbox">
+        Acceptable input types (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a>): <input data-pref="types" type="text">
+      </div>
+      <div class="hbox">
+        Password generation charset: <input data-pref="password.charset" type="text">
+      </div>
+      <div class="hbox">
+        Password generation length: <input data-pref="password.length" type="number" min=5 max="30">
+      </div>
+    </div>
+    <div id="profiles">
+      <h1>Profiles</h1>
+      <div>
+        Profile:<sup>1</sup>
+        <select><option>default</option></select>
+        <input type="button" value="Add or Remove a profile" data-cmd="edit-users">
+      </div>
+      <p>
+        1: Last selected profile is considered to be the default profile.
+      </p>
+      <table data-id="profiles">
+        <thead>
+          <tr>
+            <th>Rule Name</th>
+            <th>Rule Value</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td><input type="button" value="&#xe802;" data-cmd="delete-a-value"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <form id="edit-profiles">
+      <h2>Add a new value</h2>
+      <table>
+        <tbody>
+          <tr>
+            <td><div class="hbox"><input data-type="name" type="text" placeholder="rule name" spellcheck="false" required></div></td>
+            <td><div class="hbox"><input data-type="value" type="text" placeholder="value" spellcheck="false" required></div></td>
+            <td><input type="submit" value="&#xe801;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+    <div>
+      <h1>Rules</h1>
+      <div id="rules">
+        <table data-id="rules">
+          <thead>
+            <tr>
+              <th>Rule Name</th>
+              <th>Site Rule (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a>)</th>
+              <th>Filed Rule (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a>)</th>
+              <th>Remove</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td><input type="button" value="&#xe802;" data-cmd="delete-a-rule"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <form id="edit-rules">
+        <h2>Add a new Rule</h2>
+        <table>
+          <tbody>
+            <tr>
+              <td><div class="hbox"><input data-type="name" type="text" placeholder="rule name" spellcheck="false" required></div></td>
+              <td><div class="hbox"><input data-type="site" type="text" placeholder="site rule" spellcheck="false" required></div></td>
+              <td><div class="hbox"><input data-type="field" type="text" placeholder="field rule" spellcheck="false" required></div></td>
+              <td><input type="submit" value="&#xe801;"></td>
+            </tr>
+          </tbody>
+        </table>
+    </form>
+    <script src="shadow_index.js"></script>
+  </body>
+</html>

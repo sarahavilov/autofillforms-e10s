@@ -1,0 +1,39 @@
+{
+  "name": "AutoFill Forms",
+  "short_name": "iafforms",
+  "description": "Fill out web forms automatically",
+  "author": "Morni Colhkher",
+  "version": "0.1.0",
+  "manifest_version": 2,
+  "permissions": [
+    "storage",
+    "tabs",
+    "notifications",
+    "clipboardWrite",
+    "contextMenus"
+  ],
+  "browser_action": {
+    "default_icon": {
+      "19": "data/icons/19.png",
+      "38": "data/icons/38.png"
+    },
+    "default_popup": "data/popup/index.html"
+  },
+  "background": {
+    "scripts": ["lib/chrome/chrome.js", "lib/config.js", "lib/background.js"]
+  },
+  "homepage_url": "http://add0n.com/autofillforms-e10s.html",
+  "icons": {
+    "16": "data/icons/16.png",
+    "48": "data/icons/48.png",
+    "128": "data/icons/128.png"
+  },
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["data/inject/chrome/chrome.js", "data/inject/inject.js"],
+    "run_at": "document_start",
+    "all_frames": true,
+    "match_about_blank": true
+  }],
+  "options_page": "data/options/index.html"
+}
