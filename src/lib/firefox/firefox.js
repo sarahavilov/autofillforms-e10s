@@ -14,6 +14,8 @@ var self = require('sdk/self'),
     {ToggleButton} = require('sdk/ui/button/toggle'),
     {Panel} = require('sdk/panel');
 
+exports.version = self.version;
+
 var button = new ToggleButton({
   id: self.name,
   label: 'AutoFill Forms (e10s)',

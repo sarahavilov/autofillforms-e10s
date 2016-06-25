@@ -1,9 +1,8 @@
 'use strict';
 
 var app = {};
-var config = {};
+var config = {};  // jshint ignore:line
 
-app.webRequest = chrome.webRequest;
 app.storage = chrome.storage;
 app.tabs = chrome.tabs;
 app.timers = window;
@@ -14,6 +13,8 @@ app.runtime = chrome.runtime;
 app.notifications = chrome.notifications;
 app.extension = chrome.extension;
 app.contextMenus = chrome.contextMenus;
+
+app.version = chrome.runtime.getManifest().version;
 
 app.storage = (function () {
   let objs = {};

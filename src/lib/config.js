@@ -214,3 +214,19 @@ config.profiles.getprofile = function (name) {
   let profile = JSON.parse(app.storage.read('profile-' + name) || '{}');
   return Object.assign({}, config.profiles.users.default, profile);
 };
+
+config.welcome = {
+  get version () {
+    return app.storage.read('version');
+  },
+  set version (val) {
+    app.storage.write('version', val);
+  },
+  timeout: 3,
+  get show () {
+    return app.storage.read('show') === false ? false : true; // default is true
+  },
+  set show (val) {
+    app.storage.write('show', val);
+  }
+};

@@ -26,7 +26,7 @@ var build = (function () {
   };
 })();
 
-app.timers.setTimeout(build, 1000);
+app.timers.setTimeout(build, 3000);
 app.storage.on('rules', build);
 
 // popup
@@ -146,8 +146,9 @@ app.options.receive('types', function (types) {
   sendTypes();
 });
 app.options.receive('edit-users', function (name) {
-  let users = config.profiles.users.list.concat(name.split(/\s*\,\s*/));
-  users = users.filter((n, i, l) => l.indexOf(n) === i && n !== 'default');
+  let users = name.split(/\s*\,\s*/);
+  users = users.filter((n, i, l) => n && l.indexOf(n) === i && n !== 'default');
+  console.error(name, users)
   config.profiles.users.list = users;
   config.profiles.users.current = 'default';
   sendUsers();
@@ -202,3 +203,17 @@ app.options.receive('delete-a-rule', function (name) {
   sendRules();
 });
 
+/* startup */
+app.startup(function () {
+  // FAQs page
+  let version = config.welcome.version;
+  if (app.version !== version) {
+    app.timers.setTimeout(function () {
+      app.tabs.create({
+        url: 'http://add0n.com/autofillforms-e10s.html?v=' + app.version +
+        (version ? '&p=' + version + '&type=upgrade' : '&type=install')
+      });
+      config.welcome.version = app.version;
+    }, config.welcome.timeout);
+  }
+});

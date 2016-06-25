@@ -2,7 +2,7 @@
   "name": "AutoFill Forms",
   "short_name": "iafforms",
   "description": "Fill out web forms automatically",
-  "author": "Morni Colhkher",
+  "author": "Sarah Avilov",
   "version": "0.1.0",
   "manifest_version": 2,
   "permissions": [
@@ -32,8 +32,7 @@
     "matches": ["<all_urls>"],
     "js": ["data/inject/chrome/chrome.js", "data/inject/inject.js"],
     "run_at": "document_start",
-    "all_frames": true,
-    "match_about_blank": true
+    "all_frames": true
   }],
   "options_page": "data/options/index.html"
 }
