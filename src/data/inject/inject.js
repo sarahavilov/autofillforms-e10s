@@ -33,6 +33,7 @@ background.receive('guess', function (obj) {
       element.click();
     }
     else if (element.type === 'select-one') {
+      console.error(obj)
       Array.from(element.options).forEach(function (option, index) {
         if (
           option.value.toLowerCase() === input.value.toLowerCase() ||
