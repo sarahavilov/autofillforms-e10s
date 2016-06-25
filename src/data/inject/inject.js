@@ -30,10 +30,17 @@ background.receive('guess', function (obj) {
   obj.forEach(function (input) {
     let element = inputs[input.index];
     if (element.type === 'radio') {
+      if (
+        element.value.toLowerCase() === input.value.toLowerCase() ||
+        element.textContent.toLowerCase() === input.value.toLowerCase()
+      ) {
+        element.click();
+      }
+    }
+    else if (element.type === 'checkbox') {
       element.click();
     }
     else if (element.type === 'select-one') {
-      console.error(obj)
       Array.from(element.options).forEach(function (option, index) {
         if (
           option.value.toLowerCase() === input.value.toLowerCase() ||
@@ -46,7 +53,10 @@ background.receive('guess', function (obj) {
     }
     else {
       element.value = input.value;
-      element.selectionStart = element.selectionEnd = input.value.length;
+      try {
+        element.selectionStart = element.selectionEnd = input.value.length;
+      }
+      catch (e) {}
       change(element);
     }
   });
