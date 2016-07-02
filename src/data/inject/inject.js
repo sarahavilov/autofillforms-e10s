@@ -38,9 +38,19 @@ background.receive('guess', function (obj) {
       }
     }
     else if (element.type === 'checkbox') {
-      element.click();
+      if (
+        element.value.toLowerCase() === input.value.toLowerCase() ||
+        element.textContent.toLowerCase() === input.value.toLowerCase()
+      ) {
+        element.checked = true;
+      }
+      else {
+        element.checked = false;
+      }
+      change(element);
     }
-    else if (element.type === 'select-one') {
+    // http://contactform7.com/checkboxes-radio-buttons-and-menus/
+    else if (element.type === 'select-one' || element.type === 'select-multiple') {
       Array.from(element.options).forEach(function (option, index) {
         if (
           option.value.toLowerCase() === input.value.toLowerCase() ||
@@ -52,7 +62,8 @@ background.receive('guess', function (obj) {
       });
     }
     else {
-      element.value = input.value;
+      // supporting multi-line input boxes
+      element.value = input.value.split(/(?:\\n)|(?:\<br\>)|(?:\<br\/\>)/).join('\n');
       try {
         element.selectionStart = element.selectionEnd = input.value.length;
       }

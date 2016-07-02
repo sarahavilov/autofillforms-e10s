@@ -80,7 +80,7 @@ function rules (obj) {
 }
 
 function users (obj) {
-  elements.select.innerHTML = '';
+  elements.select.textContent = '';
   ['default'].concat(obj.list).forEach(function (user, index) {
     let option = document.createElement('option');
     option.textContent = user;
