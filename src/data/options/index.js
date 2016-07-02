@@ -41,17 +41,20 @@ function profile (obj) {
       break;
     }
   }
-  Object.keys(obj).forEach(function (key) {
+  Object.keys(obj.profile).forEach(function (key) {
     let tr = elements.profile.cloneNode(true);
+    if (obj.defaults[key]) {
+      tr.classList.add('sticky');
+    }
     elements.profiles.appendChild(tr);
     tr.dataset.name = tr.querySelector('td').textContent = key;
-    tr.dataset.value = tr.querySelector('td:nth-child(2)').textContent = obj[key];
+    tr.dataset.value = tr.querySelector('td:nth-child(2)').textContent = obj.profile[key];
   });
   elements.edit.profiles.name.value = '';
   elements.edit.profiles.value.value = '';
 }
 
-function rules (rls) {
+function rules (obj) {
   while (true) {
     let tr =  elements.rules.querySelector('tr:nth-child(2)');
     if (tr) {
@@ -61,8 +64,11 @@ function rules (rls) {
       break;
     }
   }
-  rls.forEach(function(rule) {
+  obj.rules.forEach(function(rule) {
     let tr = elements.rule.cloneNode(true);
+    if (obj.defaults[rule.name]) {
+      tr.classList.add('sticky');
+    }
     elements.rules.appendChild(tr);
     tr.dataset.name = tr.querySelector('td').textContent = rule.name;
     tr.dataset.site = tr.querySelector('td:nth-child(2)').textContent = rule.site;
@@ -118,7 +124,6 @@ document.addEventListener('click', function (e) {
   let cmd = target.dataset.cmd;
 
   if (cmd === 'edit-users') {
-
     let users = window.prompt('Comma separated list of profiles:', Array.from(elements.select.options).map(e => e.value).join(', '));
     background.send('edit-users', users);
   }
@@ -127,6 +132,9 @@ document.addEventListener('click', function (e) {
   }
   if (cmd === 'delete-a-value') {
     background.send('delete-a-value', target.parentNode.parentNode.dataset.name);
+  }
+  if (cmd === 'reset-exceptions') {
+    background.send('reset-exceptions');
   }
 });
 

@@ -10,25 +10,31 @@
   <body>
     <div>
       <h1>General Settings</h1>
-      <div class="hbox">
-        Acceptable input types (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a>): <input data-pref="types" type="text">
-      </div>
-      <div class="hbox">
-        Password generation charset: <input data-pref="password.charset" type="text">
-      </div>
-      <div class="hbox">
-        Password generation length: <input data-pref="password.length" type="number" min=5 max="30">
-      </div>
+      <table id="general">
+        <tr>
+          <td>Acceptable input types (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a>):</td>
+          <td><div class="hbox"><input data-pref="types" type="text" spellcheck="false"></div></td>
+        </tr>
+        <tr>
+          <td>Password generation charset:</td>
+          <td><div class="hbox"><input data-pref="password.charset" type="text" spellcheck="false"></div></td>
+        </tr>
+        <tr>
+          <td>Password generation length:</td>
+          <td><div class="hbox"><input data-pref="password.length" type="number" min=5 max="30"></div></td>
+        </tr>
+      </table>
     </div>
     <div id="profiles">
       <h1>Profiles</h1>
       <div>
-        Profile:<sup>1</sup>
+        Profile:
         <select><option>default</option></select>
         <input type="button" value="Add or Remove a profile" data-cmd="edit-users">
+        <input type="button" value="Reset removed rules list" title="This will clear exceptions list for the current profile; this will result to have all the default rules back" data-cmd="reset-exceptions">
       </div>
-      <p>
-        1: Last selected profile is considered to be the default profile.
+      <p class="note">
+        1: Currently selected profile is the default profile.
       </p>
       <table data-id="profiles">
         <thead>
@@ -46,12 +52,9 @@
           </tr>
         </tbody>
       </table>
-      <p>
-        <b>Note: </b>Default rules cannot be deleted. Removing cause reset to the default value
-      </p>
     </div>
     <form id="edit-profiles">
-      <h2>Add a new value</h2>
+      <h2>Add/edit a value</h2>
       <table>
         <tbody>
           <tr>
@@ -83,18 +86,18 @@
             </tr>
           </tbody>
         </table>
-        <p>
-          <b>Note: </b>Default rules cannot be deleted. Removing cause reset to the default value
+        <p class="note">
+          <b>Note: </b>Default rules cannot be deleted. Removing resets to the default value
         </p>
       </div>
     </div>
     <form id="edit-rules">
-        <h2>Add a new Rule</h2>
+        <h2>Add/edit a Rule</h2>
         <table>
           <tbody>
             <tr>
               <td><div class="hbox"><input data-type="name" type="text" placeholder="rule name" spellcheck="false" required></div></td>
-              <td><div class="hbox"><input data-type="site" type="text" placeholder="site rule" spellcheck="false" required></div></td>
+              <td><div class="hbox"><input data-type="site" type="text" placeholder="site rule" spellcheck="false"></div></td>
               <td><div class="hbox"><input data-type="field" type="text" placeholder="field rule" spellcheck="false" required></div></td>
               <td><input type="submit" value="&#xe801;"></td>
             </tr>

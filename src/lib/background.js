@@ -81,6 +81,8 @@ app.popup.receive('open-bug', () => {
 // inject
 app.inject.receive('guess', function (tabID, obj) {
   let _rules = config.profiles.getrules();
+  config.profiles.getExceptions().forEach(n => delete _rules[n]);
+
   let rules = Object.keys(_rules).map(name => ({
     name,
     field: new RegExp(_rules[name]['field-rule'], 'i'),
@@ -104,7 +106,10 @@ app.inject.receive('guess', function (tabID, obj) {
 
 // options
 function sendProfile () {
-  app.options.send('profile', config.profiles.getprofile());
+  app.options.send('profile', {
+    profile: config.profiles.getprofile(),
+    defaults: config.profiles.users.default
+  });
 }
 function sendUsers () {
   app.options.send('users', {
@@ -114,11 +119,14 @@ function sendUsers () {
 }
 function sendRules () {
   let rules = config.profiles.getrules();
-  app.options.send('rules', Object.keys(rules).map(name => ({
-    site: rules[name]['site-rule'],
-    field: rules[name]['field-rule'],
-    name
-  })));
+  app.options.send('rules', {
+    rules: Object.keys(rules).map(name => ({
+      site: rules[name]['site-rule'],
+      field: rules[name]['field-rule'],
+      name
+    })),
+    defaults: config.profiles.rules
+  });
 }
 function sendPassword () {
   app.options.send('password', config.settings.password);
@@ -148,7 +156,6 @@ app.options.receive('types', function (types) {
 app.options.receive('edit-users', function (name) {
   let users = name.split(/\s*\,\s*/);
   users = users.filter((n, i, l) => n && l.indexOf(n) === i && n !== 'default');
-  console.error(name, users)
   config.profiles.users.list = users;
   config.profiles.users.current = 'default';
   sendUsers();
@@ -170,7 +177,12 @@ app.options.receive('add-to-profile', function (obj) {
 app.options.receive('delete-a-value', function (name) {
   let current = config.profiles.users.current;
   let profile = config.profiles.getprofile(current);
+  let defaults = Object.keys(config.profiles.users.default);
   delete profile[name];
+  // deleting a custom rule
+  if (defaults.indexOf(name) !== -1) {
+    config.profiles.addException(current, name);
+  }
   let tmp = {};
   Object.keys(profile).forEach(function (key) {
     if (profile[key] !== config.profiles.users.default[key]) {
@@ -178,6 +190,10 @@ app.options.receive('delete-a-value', function (name) {
     }
   });
   config.profiles.setprofile(current, tmp);
+  sendProfile();
+});
+app.options.receive('reset-exceptions', function () {
+  config.profiles.clearExceptions(config.profiles.users.current);
   sendProfile();
 });
 app.options.receive('change-profile', function (name) {
@@ -192,7 +208,7 @@ app.options.receive('add-to-rules', function (obj) {
   }
   else {
     config.profiles.setrule(obj.name, {
-      'site-rule': obj.site,
+      'site-rule': obj.site || '(?:)',
       'field-rule': obj.field
     });
   }

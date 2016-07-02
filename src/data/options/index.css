@@ -34,9 +34,14 @@ input[type=text]:focus{
 input:active {
   border-color: rgba(0, 0, 0, 0.3);
 }
+input[type=number],
 input[type=text] {
   flex: 1;
   margin-left: 5px;
+}
+
+thead th {
+  white-space: nowrap;
 }
 
 tbody tr {
@@ -58,7 +63,27 @@ td:last-child input {
   font-family: "fontello";
 }
 
+tr.sticky td:first-child {
+  color: #7f7f7f;
+}
+
 #profiles tbody tr:first-child,
 #rules tbody tr:first-child {
   display: none;
+}
+#general td:first-child {
+  width: 1px;
+  white-space: nowrap;
+}
+#general td:last-child {
+  width: auto;
+}
+#general tr {
+  background-color: #fff;
+}
+
+.note {
+  border: solid 1px #a5a860;
+  background-color: #cdd077;
+  padding: 5px;
 }

@@ -212,7 +212,26 @@ config.profiles.setprofile = function (name, obj) {
 config.profiles.getprofile = function (name) {
   name = name || config.profiles.users.current;
   let profile = JSON.parse(app.storage.read('profile-' + name) || '{}');
-  return Object.assign({}, config.profiles.users.default, profile);
+  let exceptions = JSON.parse(app.storage.read('profile-' + name + '-exceptions') || '[]');
+  profile = Object.assign({}, config.profiles.users.default, profile);
+  exceptions.forEach(name => delete profile[name]);
+  return profile;
+};
+config.profiles.addException = function (name, value) {
+  name = name || config.profiles.users.current;
+  let pref = 'profile-' + name + '-exceptions';
+  let exceptions = JSON.parse(app.storage.read(pref) || '[]');
+  exceptions.push(value);
+  exceptions = exceptions.filter((n, i, l) => l.indexOf(n) === i);
+  app.storage.write(pref, JSON.stringify(exceptions));
+};
+config.profiles.clearExceptions = function (name) {
+  name = name || config.profiles.users.current;
+  app.storage.write('profile-' + name + '-exceptions', '[]');
+};
+config.profiles.getExceptions = function (name) {
+  name = name || config.profiles.users.current;
+  return JSON.parse(app.storage.read('profile-' + name + '-exceptions') || '[]');
 };
 
 config.welcome = {
