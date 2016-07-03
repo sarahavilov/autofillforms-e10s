@@ -1,4 +1,4 @@
-/* globals background */
+/* globals background, app */
 'use strict';
 
 function change (element) {
@@ -10,10 +10,13 @@ function change (element) {
 
 /**/
 var context = null;
-
-document.addEventListener('contextmenu', function(e) {
+(function (callback) {
+  document.addEventListener('contextmenu', callback, true);
+  app.unload(() => document.removeEventListener('contextmenu', callback));
+})(function(e) {
   context = e.target;
-}, true);
+});
+
 background.receive('contextmenu', function (val) {
   if (context) {
     context.value = val;

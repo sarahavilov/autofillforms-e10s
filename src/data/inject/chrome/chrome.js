@@ -16,3 +16,7 @@ var background = {
 var manifest = {
   url: chrome.extension.getURL('/data/')
 };
+
+var app = {
+  unload : function () {}
+}

@@ -105,12 +105,13 @@ app.inject.receive('guess', function (tabID, obj) {
   // use String_random.js if value is a regular expression
   inputs.forEach(function (input, index) {
     let value = inputs[index].value;
-    if (value.startsWith('/') && value.endsWith('/')) {
+    let tmp = /^\/(.+)\/[gimuy]*$/.exec(value);
+    if (tmp && tmp.length) {
       try {
-        inputs[index].value = regtools.gen(value.slice(1, -1));
+        inputs[index].value = regtools.gen(tmp[1]);
       }
       catch (e) {
-        console.error(e);
+        inputs[index].value = e.message || e;
       }
     }
   });
