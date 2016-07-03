@@ -30,18 +30,15 @@ function contextmenu (name) {
 var build = (function () {
   let ids = [];
   return function () {
-    let exceptions = config.profiles.getExceptions();
     ids.forEach(id => app.contextMenus.remove(id));
     ids = [];
-    Object.keys(config.profiles.getrules()).sort()
-      .filter(name => exceptions.indexOf(name) === -1)
-      .forEach(function (title) {
-        ids.push(app.contextMenus.create({
-          title,
-          contexts: ['editable'],
-          onclick: contextmenu.bind(app, title)
-        }));
-      });
+    Object.keys(config.profiles.getprofile()).sort().forEach(function (title) {
+      ids.push(app.contextMenus.create({
+        title,
+        contexts: ['editable'],
+        onclick: contextmenu.bind(app, title)
+      }));
+    });
   };
 })();
 
@@ -238,12 +235,10 @@ app.options.receive('add-to-rules', function (obj) {
     });
   }
   sendRules();
-  build();
 });
 app.options.receive('delete-a-rule', function (name) {
   config.profiles.setrule(name, null, true);
   sendRules();
-  build();
 });
 
 /* startup */
