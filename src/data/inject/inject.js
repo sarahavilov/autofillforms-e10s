@@ -66,7 +66,7 @@ background.receive('guess', function (obj) {
     }
     else {
       // supporting multi-line input boxes
-      element.value = (input.value || '').split(/(?:\\n)|(?:\<br\>)|(?:\<br\/\>)/).join('\n');
+      element.value = input.value;
       try {
         element.selectionStart = element.selectionEnd = input.value.length;
       }

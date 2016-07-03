@@ -4,7 +4,7 @@ var app = app || require('./firefox/firefox');
 var config = config || require('./config');
 var regtools = regtools || require('./regtools');
 
-function checkRegExp (value) {
+function format (value) {
   let tmp = /^\/(.+)\/[gimuy]*$/.exec(value);
   if (tmp && tmp.length) {
     try {
@@ -14,12 +14,13 @@ function checkRegExp (value) {
       value = e.message || e;
     }
   }
+  value = value.split(/(?:\\n)|(?:\<br\>)|(?:\<br\/\>)/).join('\n');
   return value;
 }
 
 function contextmenu (name) {
   let value = config.profiles.getprofile()[name] || name;
-  value = checkRegExp(value);
+  value = format(value);
   app.tabs.query({
     active: true,
     currentWindow: true
@@ -120,7 +121,7 @@ app.inject.receive('guess', function (tabID, obj) {
   let profile = config.profiles.getprofile(obj.profile);
   inputs.forEach((input, index) => inputs[index].value = profile[input.rule] || input.rule);
   // use String_random.js if value is a regular expression
-  inputs.forEach((input, index) => inputs[index].value = checkRegExp(inputs[index].value));
+  inputs.forEach((input, index) => inputs[index].value = format(inputs[index].value));
   app.inject.send(tabID, 'guess', inputs);
 });
 
