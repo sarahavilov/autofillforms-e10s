@@ -20,7 +20,12 @@
     "default_popup": "data/popup/index.html"
   },
   "background": {
-    "scripts": ["lib/chrome/chrome.js", "lib/config.js", "lib/background.js"]
+    "scripts": [
+      "lib/chrome/chrome.js",
+      "lib/config.js",
+      "lib/regtools.js",
+      "lib/background.js"
+    ]
   },
   "homepage_url": "http://add0n.com/autofillforms-e10s.html",
   "icons": {
@@ -30,7 +35,10 @@
   },
   "content_scripts": [{
     "matches": ["<all_urls>"],
-    "js": ["data/inject/chrome/chrome.js", "data/inject/inject.js"],
+    "js": [
+      "data/inject/chrome/chrome.js",
+      "data/inject/inject.js"
+    ],
     "run_at": "document_start",
     "all_frames": true
   }],

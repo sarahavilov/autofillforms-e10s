@@ -2,6 +2,7 @@
 
 var app = {};
 var config = {};  // jshint ignore:line
+var regtools = {};  // jshint ignore:line
 
 app.storage = chrome.storage;
 app.tabs = chrome.tabs;

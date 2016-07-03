@@ -2,6 +2,7 @@
 
 var app = app || require('./firefox/firefox');
 var config = config || require('./config');
+var regtools = regtools || require('./regtools');
 
 function contextmenu (name) {
   let value = config.profiles.getprofile()[name] || name;
@@ -101,6 +102,18 @@ app.inject.receive('guess', function (tabID, obj) {
   // assigning value
   let profile = config.profiles.getprofile(obj.profile);
   inputs.forEach((input, index) => inputs[index].value = profile[input.rule] || input.rule);
+  // use String_random.js if value is a regular expression
+  inputs.forEach(function (input, index) {
+    let value = inputs[index].value;
+    if (value.startsWith('/') && value.endsWith('/')) {
+      try {
+        inputs[index].value = regtools.gen(value.slice(1, -1));
+      }
+      catch (e) {
+        console.error(e);
+      }
+    }
+  });
   app.inject.send(tabID, 'guess', inputs);
 });
 
