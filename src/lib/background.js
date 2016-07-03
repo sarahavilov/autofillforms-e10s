@@ -4,8 +4,22 @@ var app = app || require('./firefox/firefox');
 var config = config || require('./config');
 var regtools = regtools || require('./regtools');
 
+function checkRegExp (value) {
+  let tmp = /^\/(.+)\/[gimuy]*$/.exec(value);
+  if (tmp && tmp.length) {
+    try {
+      value = regtools.gen(tmp[1]);
+    }
+    catch (e) {
+      value = e.message || e;
+    }
+  }
+  return value;
+}
+
 function contextmenu (name) {
   let value = config.profiles.getprofile()[name] || name;
+  value = checkRegExp(value);
   app.tabs.query({
     active: true,
     currentWindow: true
@@ -15,15 +29,18 @@ function contextmenu (name) {
 var build = (function () {
   let ids = [];
   return function () {
+    let exceptions = config.profiles.getExceptions();
     ids.forEach(id => app.contextMenus.remove(id));
     ids = [];
-    Object.keys(config.profiles.getrules()).sort().forEach(function (title) {
-      ids.push(app.contextMenus.create({
-        title,
-        contexts: ['editable'],
-        onclick: contextmenu.bind(app, title)
-      }));
-    });
+    Object.keys(config.profiles.getrules()).sort()
+      .filter(name => exceptions.indexOf(name) === -1)
+      .forEach(function (title) {
+        ids.push(app.contextMenus.create({
+          title,
+          contexts: ['editable'],
+          onclick: contextmenu.bind(app, title)
+        }));
+      });
   };
 })();
 
@@ -103,18 +120,7 @@ app.inject.receive('guess', function (tabID, obj) {
   let profile = config.profiles.getprofile(obj.profile);
   inputs.forEach((input, index) => inputs[index].value = profile[input.rule] || input.rule);
   // use String_random.js if value is a regular expression
-  inputs.forEach(function (input, index) {
-    let value = inputs[index].value;
-    let tmp = /^\/(.+)\/[gimuy]*$/.exec(value);
-    if (tmp && tmp.length) {
-      try {
-        inputs[index].value = regtools.gen(tmp[1]);
-      }
-      catch (e) {
-        inputs[index].value = e.message || e;
-      }
-    }
-  });
+  inputs.forEach((input, index) => inputs[index].value = checkRegExp(inputs[index].value));
   app.inject.send(tabID, 'guess', inputs);
 });
 
@@ -187,6 +193,7 @@ app.options.receive('add-to-profile', function (obj) {
   });
   config.profiles.setprofile(current, tmp);
   sendProfile();
+  build();
 });
 app.options.receive('delete-a-value', function (name) {
   let current = config.profiles.users.current;
@@ -205,15 +212,18 @@ app.options.receive('delete-a-value', function (name) {
   });
   config.profiles.setprofile(current, tmp);
   sendProfile();
+  build();
 });
 app.options.receive('reset-exceptions', function () {
   config.profiles.clearExceptions(config.profiles.users.current);
   sendProfile();
+  build();
 });
 app.options.receive('change-profile', function (name) {
   config.profiles.users.current = name;
   sendUsers();
   sendProfile();
+  build();
 });
 app.options.receive('add-to-rules', function (obj) {
   let rules = config.profiles.rules;
@@ -227,10 +237,12 @@ app.options.receive('add-to-rules', function (obj) {
     });
   }
   sendRules();
+  build();
 });
 app.options.receive('delete-a-rule', function (name) {
   config.profiles.setrule(name, null, true);
   sendRules();
+  build();
 });
 
 /* startup */
