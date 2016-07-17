@@ -11,8 +11,11 @@ function change (element) {
 /**/
 var context = null;
 (function (callback) {
-  document.addEventListener('contextmenu', callback, true);
-  app.unload(() => document.removeEventListener('contextmenu', callback));
+  try {
+    document.addEventListener('contextmenu', callback, true);
+    app.unload(() => document.removeEventListener('contextmenu', callback));
+  }
+  catch (e) {}
 })(function(e) {
   context = e.target;
 });
@@ -32,6 +35,9 @@ var inputs = [];
 background.receive('guess', function (obj) {
   obj.forEach(function (input) {
     let element = inputs[input.index];
+    if (!element) {
+      return;
+    }
     if (element.type === 'radio') {
       if (
         element.value.toLowerCase() === input.value.toLowerCase() ||
@@ -95,4 +101,83 @@ background.receive('fill', function (obj) {
       }))
     });
   }
+});
+
+// guess
+background.receive('find-rules', function (obj) {
+
+  let types = new RegExp(obj.types);
+  let rules = [];
+  Array.from(document.forms).forEach(function (form) {
+    Array.from(form.querySelectorAll('[name]')).filter(input => types.test(input.type)).forEach(function (input) {
+      // only add rule is non of existing ones is a match
+      let count = Object.keys(obj.rules)
+        .filter(name => {
+          let rule = obj.rules[name];
+          let t1 = (new RegExp(rule['site-rule'], 'i')).test(window.location.href);
+          let t2 = (new RegExp(rule['field-rule'], 'i')).test(input.name);
+          return t1 && t2;
+        }).length;
+      if (count === 0) {
+        let tmp = {
+          name: input.name,
+          field: input.name.replace(/([`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/])/gi, '\\$1')
+        };
+        obj.rules[input.name] = {
+          'site-rule': tmp.site,
+          'field-rule': tmp.filed
+        };
+        rules.push(tmp);
+      }
+    });
+  });
+  if (rules.length === 0) {
+    return background.send('notify', 'no new rule is detected');
+  }
+  let site = window.confirm(`Only add rules for this domain (${window.location.host})?`);
+  if (site) {
+    site = window.location.host.replace(/([`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/])/gi, '\\$1');
+  }
+  else {
+    site = '(?:)';
+  }
+  rules = rules.map(r => {
+    r.site = site;
+    return r;
+  });
+  background.send('generated-rules', rules);
+});
+background.receive('to-profile', function (obj) {
+  let types = new RegExp(obj.types, 'i');
+  let names = {};
+  Array.from(document.forms).forEach(function (form) {
+    Array.from(form.querySelectorAll('[name]')).filter(input => types.test(input.type)).forEach(function (input) {
+      if (input.value) {
+        names[input.name] = input.value;
+      }
+    });
+  });
+  let href = document.location.href;
+  let keys = Object.keys(names);
+  if (keys.length === 0) {
+    return background.send('notify', 'noting to collect');
+  }
+  let name = window.prompt('Select a name for your new profile?', 'default');
+  if (!name) {
+    return;
+  }
+
+  let values = {};
+  Object.keys(obj.rules).forEach(function (name) {
+    let rule = obj.rules[name];
+    if ((new RegExp(rule['site-rule'], 'i')).test(href) === false) {
+      return;
+    }
+    let f = new RegExp(rule['field-rule'], 'i');
+    keys.filter(k => f.test(k)).forEach((n) => values[name] = names[n]);
+  });
+  background.send('generated-values', {
+    name,
+    values
+  });
 });

@@ -5,7 +5,7 @@ var config = config || exports;
 
 config.settings = {
   get types () {
-    return app.storage.read('types') || '^(?:(?:text(?:area)?)|(?:select-(?:(?:one)|(?:multiple)))|(?:checkbox)|(?:radio)|(?:email)|(?:url)|(?:number)|(?:month)|(?:week)|(?:tel)|(?:password)|(?:file))$';
+    return app.storage.read('types') || '^(?:(?:text(?:area)?)|(?:select-(?:(?:one)|(?:multiple)))|(?:checkbox)|(?:radio)|(?:email)|(?:url)|(?:number)|(?:month)|(?:week)|(?:tel)|(?:file))$';
   },
   set types (val) {
     app.storage.write('types', val);

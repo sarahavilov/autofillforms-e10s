@@ -3,7 +3,7 @@
   "short_name": "iafforms",
   "description": "Fill out web forms automatically",
   "author": "Sarah Avilov",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "manifest_version": 2,
   "permissions": [
     "storage",

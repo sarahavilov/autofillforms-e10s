@@ -1,24 +1,28 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="index.css"/>
     <link rel="stylesheet" href="fontello.css"/>
+    <link rel="stylesheet" href="index.css"/>
   </head>
   <body>
-    <div id="content">
-      <input type="button" value="Fill all Forms" data-cmd="fill-forms">
-      <span style="padding: 3px">via</span>
-      <select>
-      </select>
-    </div>
-
     <div id="toolbar">
-      <span data-cmd="gen-password">Generate Password</span>
-      <span data-cmd="open-settings" class="icon-settings"></span>
-      <span data-cmd="open-faqs" class="icon-info"></span>
-      <span data-cmd="open-bug" class="icon-bug"></span>
+      <input type="button" data-cmd="open-settings" value="&#xe800;" title="Open settings page">
+      <input type="button" data-cmd="open-faqs" value="&#xe801;" title="Open FAQs page">
+      <input type="button" data-cmd="open-bugs" value="&#xe802;" title="Open bug reporter">
     </div>
+    <div id="filling">
 
+      <button data-cmd="fill-forms"><b>Fill Forms</b><br>via<br>"<b id="profile">default</b>" Profile</button>
+      <select>
+        <option>1</option>
+      </select>
+
+    </div>
+    <div id="tools">
+      <input type="button" data-cmd="generate-password" value="Generate a Password" title="Generate a random password">
+      <input type="button" data-cmd="extract-rules" value="Extract Rules" title="Extract all possible rules from current page">
+      <input type="button" data-cmd="create-profile" value="Update Profile" title="Create a new profile or update existing profile from data inserted in the page based on the known rules">
+    </div>
     <script src="shadow_index.js"></script>
   </body>
 </html>

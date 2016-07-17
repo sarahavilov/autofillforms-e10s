@@ -1,83 +1,104 @@
+body, html {
+  height: 100%;
+}
 body {
-  width: 300px;
-  overflow: hidden;
-}
-body, input, select {
-  font-size: 12px;
-  font-family: arial, sans-serif;
-  background-color: #fff;
-}
-body>div {
   display: flex;
-  flex-direction: row;
-  height: 90px;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #eee;
 }
-select,
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  body {
+    width: 400px;
+    height: 300px;
+  }
+}
+body,
+button,
 input {
-  border: none;
-  box-shadow: 0 0 0 1px #d9d9d9;
+  font-size: 11px;
+}
+
+input,
+select,
+button {
+  border: solid 1px #d8d8d8;
   background-color: #fff;
-  height: 50px;
-  border-radius: 0;
-  flex: 1;
   outline: none;
   cursor: pointer;
+}
+button:active,
+input:active {
+  opacity: 0.7;
+}
+
+select {
+  background: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url(arrow.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  border-radius: 0;
 }
 select:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
 }
 
-select {
-  background: transparent;
-  padding-left: 5px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: url(arrow.png) no-repeat center right 5px;
-  background-size: 12px;
+#toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }
-input:active {
-  box-shadow: 0 0 0 1px #a0a0a0;
+#toolbar input {
+  width: 45px;
+  height: 24px;
+  font-family: fontello;
+  font-size: 120%;
+  margin: 1px;
+  color: #fff;
+  border: none;
+}
+#toolbar input:nth-child(3) {
+  background-color: #edb700;
+}
+#toolbar input:nth-child(2) {
+  background-color: #29a24c;
+}
+#toolbar input:nth-child(1) {
+  background-color: #3c81e7;
 }
 
-#content {
-  padding-top: 20px;
+#filling {
+  flex: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
+#filling button,
+#filling select {
+  height: 100px;
+}
+#filling button {
+  width: 140px;
+  line-height: 16px;
+}
+#filling select {
+  width: 16px;
+  text-indent: 30px;
+  border-left: none;
+}
 
-#toolbar {
-  position: absolute;
-  right: 0;
-  top: 0;
+#tools {
+  display: flex;
+  flex-direction: row;
+  padding: 0 3px 6px 3px;
+}
+#tools>input {
+  flex: 1;
+  margin: 0 3px;
   height: 30px;
-  align-items: flex-start;
-}
-#toolbar span {
-  margin: 0 1px;
-  padding: 5px;
-  cursor: pointer;
-  color: #fff;
-  text-align: center;
-}
-
-.icon-bug,
-.icon-info,
-.icon-settings {
-  min-width: 30px;
-}
-[class^="icon-"]:before {
-  font-size: 120%;
-}
-.icon-settings {
-  background-color: #4587f4;
-}
-.icon-info {
-  background-color: #36a954;
-}
-.icon-bug {
-  background-color: #fbbf0f;
-}
-span[data-cmd="gen-password"] {
-  background-color: #eb4b3e;
 }

@@ -4,6 +4,27 @@ var app = app || require('./firefox/firefox');
 var config = config || require('./config');
 var regtools = regtools || require('./regtools');
 
+var EventEmitter = function () {
+  this.callbacks = {};
+};
+EventEmitter.prototype.on = function (name, callback) {
+  this.callbacks[name] = this.callbacks[name] || [];
+  this.callbacks[name].push(callback);
+};
+EventEmitter.prototype.emit = function (name, value) {
+  (this.callbacks[name] || []).forEach(c => c(value));
+};
+var trigger = new EventEmitter();
+
+function notify (message) {
+  app.notifications.create(null, {
+    type: 'basic',
+    iconUrl: './data/icons/48.png',
+    title: 'AutoFill Forms',
+    message
+  });
+}
+
 function format (value) {
   let tmp = /^\/(.+)\/[gimuy]*$/.exec(value);
   if (tmp && tmp.length) {
@@ -46,13 +67,13 @@ app.timers.setTimeout(build, 3000);
 app.storage.on('rules', build);
 
 // popup
-app.popup.receive('fill-forms', function (profile) {
+app.popup.receive('fill-forms', function () {
   app.tabs.query({
     active: true,
     currentWindow: true
   }, (tabs) => tabs.forEach(tab => app.inject.send(tab.id, 'fill', {
     types: config.settings.types,
-    profile
+    profile: config.profiles.users.current
   })));
   app.popup.hide();
 });
@@ -60,7 +81,7 @@ app.popup.receive('show', () => app.popup.send('show', {
   list: config.profiles.users.list,
   current: config.profiles.users.current
 }));
-app.popup.receive('gen-password', function () {
+app.popup.receive('generate-password', function () {
   function gen(charset, length) {
     return Array.apply(null, new Array(length))
       .map(() => charset.charAt(Math.floor(Math.random() * charset.length)))
@@ -87,41 +108,41 @@ app.popup.receive('open-faqs', () => {
   });
   app.popup.hide();
 });
-app.popup.receive('open-bug', () => {
+app.popup.receive('open-bugs', () => {
   app.tabs.create({
     url: 'https://github.com/sarahavilov/autofillforms-e10s'
   });
   app.popup.hide();
 });
-
-// inject
-app.inject.receive('guess', function (tabID, obj) {
-  let _rules = config.profiles.getrules();
-  config.profiles.getExceptions().forEach(n => delete _rules[n]);
-
-  let rules = Object.keys(_rules).map(name => ({
-    name,
-    field: new RegExp(_rules[name]['field-rule'], 'i'),
-    site: new RegExp(_rules[name]['site-rule'], 'i')
-  }));
-
-  let inputs = obj.inputs.map(function (input) {
-    for (let n in rules) {
-      if (rules[n].field.test(input.name) && rules[n].site.test(obj.href)) {
-        return Object.assign(input, {rule: rules[n].name});
-      }
-    }
-    return null;
-  }).filter(input => input);
-
-  // assigning value
-  let profile = config.profiles.getprofile(obj.profile);
-  inputs.forEach((input, index) => inputs[index].value = profile[input.rule] || input.rule);
-  // use String_random.js if value is a regular expression
-  inputs.forEach((input, index) => inputs[index].value = format(inputs[index].value));
-  app.inject.send(tabID, 'guess', inputs);
+app.popup.receive('profile', function (name) {
+  config.profiles.users.current = name;
+  trigger.emit('profile');
 });
+app.popup.receive('extract-rules', function () {
+  let rules = config.profiles.getrules();
+  config.profiles.getExceptions().forEach(n => delete rules[n]);
 
+  app.tabs.query({
+    active: true,
+    currentWindow: true
+  }, (tabs) => tabs.forEach(tab => app.inject.send(tab.id, 'find-rules', {
+    type: config.settings.types,
+    rules
+  })));
+  app.popup.hide();
+});
+app.popup.receive('create-profile', function () {
+  let rules = config.profiles.getrules();
+  config.profiles.getExceptions().forEach(n => delete rules[n]);
+  app.tabs.query({
+    active: true,
+    currentWindow: true
+  }, (tabs) => tabs.forEach(tab => app.inject.send(tab.id, 'to-profile', {
+    types: config.settings.types,
+    rules
+  })));
+  app.popup.hide();
+});
 // options
 function sendProfile () {
   app.options.send('profile', {
@@ -171,15 +192,23 @@ app.options.receive('types', function (types) {
   config.settings.types = types;
   sendTypes();
 });
-app.options.receive('edit-users', function (name) {
+trigger.on('users', function () {
+  sendUsers();
+  sendProfile();
+});
+app.options.receive('edit-users', (name) => {
   let users = name.split(/\s*\,\s*/);
   users = users.filter((n, i, l) => n && l.indexOf(n) === i && n !== 'default');
   config.profiles.users.list = users;
   config.profiles.users.current = 'default';
-  sendUsers();
-  sendProfile();
+
+  trigger.emit('users');
 });
-app.options.receive('add-to-profile', function (obj) {
+trigger.on('update-profile', function () {
+  sendProfile();
+  build();
+});
+trigger.on('add-to-profile', function (obj) {
   let current = config.profiles.users.current;
   let profile = config.profiles.getprofile(current);
   profile[obj.name] = obj.value;
@@ -190,8 +219,10 @@ app.options.receive('add-to-profile', function (obj) {
     }
   });
   config.profiles.setprofile(current, tmp);
-  sendProfile();
-  build();
+});
+app.options.receive('add-to-profile', (obj) => {
+  trigger.emit('add-to-profile', obj);
+  trigger.emit('update-profile');
 });
 app.options.receive('delete-a-value', function (name) {
   let current = config.profiles.users.current;
@@ -217,11 +248,14 @@ app.options.receive('reset-exceptions', function () {
   sendProfile();
   build();
 });
-app.options.receive('change-profile', function (name) {
-  config.profiles.users.current = name;
+trigger.on('profile', function () {
   sendUsers();
   sendProfile();
   build();
+});
+app.options.receive('change-profile', (name) => {
+  config.profiles.users.current = name;
+  trigger.emit('profile');
 });
 app.options.receive('add-to-rules', function (obj) {
   let rules = config.profiles.rules;
@@ -240,7 +274,59 @@ app.options.receive('delete-a-rule', function (name) {
   config.profiles.setrule(name, null, true);
   sendRules();
 });
+// inject
+app.inject.receive('guess', function (tabID, obj) {
+  let _rules = config.profiles.getrules();
+  config.profiles.getExceptions().forEach(n => delete _rules[n]);
 
+  let rules = Object.keys(_rules).map(name => ({
+    name,
+    field: new RegExp(_rules[name]['field-rule'], 'i'),
+    site: new RegExp(_rules[name]['site-rule'], 'i')
+  }));
+
+  let inputs = obj.inputs.map(function (input) {
+    for (let n in rules) {
+      if (rules[n].field.test(input.name) && rules[n].site.test(obj.href)) {
+        return Object.assign(input, {rule: rules[n].name});
+      }
+    }
+    return null;
+  }).filter(input => input);
+
+  // assigning value
+  let profile = config.profiles.getprofile(obj.profile);
+  inputs.forEach((input, index) => inputs[index].value = profile[input.rule] || input.rule);
+  // use String_random.js if value is a regular expression
+  inputs.forEach((input, index) => inputs[index].value = format(inputs[index].value));
+  app.inject.send(tabID, 'guess', inputs);
+});
+app.inject.receive('generated-rules', function (tabID, rules) {
+  rules.forEach(obj => config.profiles.setrule(obj.name, {
+    'site-rule': obj.site || '(?:)',
+    'field-rule': obj.field
+  }));
+  sendRules();
+  notify(`${rules.length} rules is added or updated in your rule list`);
+});
+app.inject.receive('generated-values', function (tabID, obj) {
+  let users = config.profiles.users.list.concat(obj.name);
+  users = users.filter((n, i, l) => n && l.indexOf(n) === i && n !== 'default');
+  config.profiles.users.list = users;
+  config.profiles.users.current = obj.name;
+  trigger.emit('users');
+
+  let keys = Object.keys(obj.values);
+  keys.forEach(k => {
+    trigger.emit('add-to-profile', {
+      name: k,
+      value: obj.values[k]
+    });
+  });
+  trigger.emit('update-profile');
+  notify(`${keys.length} values is added or updated for "${obj.name}" profile.`);
+});
+app.inject.receive('notify', (tabID, msg) => notify(msg));
 /* startup */
 app.startup(function () {
   // FAQs page

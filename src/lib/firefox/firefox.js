@@ -61,8 +61,8 @@ exports.popup = (function () {
   popup.on('hide', () => button.state('window', {checked: false}));
   return {
     show: (position) => popup.show({
-      width: 320,
-      height: 120,
+      width: 400,
+      height: 300,
       position
     }),
     send: (id, data) => popup.port.emit(id, data),
