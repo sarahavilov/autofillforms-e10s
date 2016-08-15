@@ -115,7 +115,7 @@ exports.extension = {
 exports.inject = (function () {
   let workers = [], callbacks = [];
   pageMod.PageMod({
-    include: ['http://*', 'https://*'],
+    include: ['http://*', 'https://*', 'file://*'],
     contentScriptFile: [
       self.data.url('./inject/firefox/firefox.js'),
       self.data.url('./inject/inject.js')

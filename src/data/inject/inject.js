@@ -109,7 +109,11 @@ background.receive('find-rules', function (obj) {
   let types = new RegExp(obj.types);
   let rules = [];
   Array.from(document.forms).forEach(function (form) {
-    Array.from(form.querySelectorAll('[name]')).filter(input => types.test(input.type)).forEach(function (input) {
+    Array.from(form.querySelectorAll('[name]'))
+    .filter(input => types.test(input.type))
+    // checkbox
+    .filter(input => input.type === 'checkbox' ? input.checked : true)
+    .forEach(function (input) {
       // only add rule is non of existing ones is a match
       let count = Object.keys(obj.rules)
         .filter(name => {
@@ -151,7 +155,11 @@ background.receive('to-profile', function (obj) {
   let types = new RegExp(obj.types, 'i');
   let names = {};
   Array.from(document.forms).forEach(function (form) {
-    Array.from(form.querySelectorAll('[name]')).filter(input => types.test(input.type)).forEach(function (input) {
+    Array.from(form.querySelectorAll('[name]'))
+    .filter(input => types.test(input.type))
+    // checkbox
+    .filter(input => input.type === 'checkbox' ? input.checked : true)
+    .forEach(function (input) {
       if (input.value) {
         names[input.name] = input.value;
       }
