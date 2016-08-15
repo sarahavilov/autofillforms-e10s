@@ -162,7 +162,7 @@ background.receive('to-profile', function (obj) {
   if (keys.length === 0) {
     return background.send('notify', 'noting to collect');
   }
-  let name = window.prompt('Select a name for your new profile?', 'default');
+  let name = window.prompt('Select a name for your new profile or use an old name to update existing profile?', obj.profile);
   if (!name) {
     return;
   }

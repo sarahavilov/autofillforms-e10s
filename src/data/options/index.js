@@ -127,14 +127,26 @@ document.addEventListener('click', function (e) {
     let users = window.prompt('Comma separated list of profiles:', Array.from(elements.select.options).map(e => e.value).join(', '));
     background.send('edit-users', users);
   }
-  if (cmd === 'delete-a-rule') {
+  else if (cmd === 'delete-a-rule') {
     background.send('delete-a-rule', target.parentNode.parentNode.dataset.name);
   }
-  if (cmd === 'delete-a-value') {
+  else if (cmd === 'delete-a-value') {
     background.send('delete-a-value', target.parentNode.parentNode.dataset.name);
   }
-  if (cmd === 'reset-exceptions') {
-    background.send('reset-exceptions');
+  else {
+    background.send(cmd);
+  }
+});
+document.addEventListener('change', function (e) {
+  let target = e.target;
+  let files = target.files;
+  if (files.length) {
+    let reader = new FileReader();
+    reader.onload = function () {
+      background.send(target.dataset.cmd, reader.result);
+      target.value = '';
+    };
+    reader.readAsText(files[0]);
   }
 });
 
@@ -160,4 +172,16 @@ document.addEventListener('change', function (e) {
   if (pref) {
     background.send(pref, target.value);
   }
+});
+
+background.receive('download', function (obj) {
+  let a = document.createElement('a');
+  a.download = 'AutoFill-Forms-Exported-' + obj.name + '-' + (new Date()).toLocaleString().replace(/[\s\:\/]/g, '-').replace(',', '') + '.jon';
+  let blob = new Blob([JSON.stringify(obj.content, null, 2)], {type : 'application/json'});
+  let reader = new FileReader();
+  reader.onload = function () {
+    a.href = reader.result;
+    a.click();
+  };
+  reader.readAsDataURL(blob);
 });

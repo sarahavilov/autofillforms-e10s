@@ -57,6 +57,8 @@ select:-moz-focusring {
   width: 45px;
   height: 24px;
   font-family: fontello;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: 120%;
   margin: 1px;
   color: #fff;

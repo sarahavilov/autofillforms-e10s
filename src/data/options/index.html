@@ -113,6 +113,22 @@
           </tbody>
         </table>
     </form>
+    <div>
+      <h2>Import/Export</h2>
+      <div>
+        <input type="button" data-cmd="export-all" value="Export all (profiles and rules)">
+        <input type="button" data-cmd="export-rules" value="Export all rules">
+        <input type="button" data-cmd="export-profiles" value="Export all profiles">
+        <input type="button" data-cmd="export-active" value="Export only the active profile">
+        -
+        <label class="button">Import (append)
+          <input data-cmd="import" type="file">
+        </label>
+      </div>
+      <p class="note">
+        <b>Note: </b>For the extension to work on another machine, rules and at least a single profile need to be imported.
+      </p>
+    </div>
     <script src="shadow_index.js"></script>
   </body>
 </html>

@@ -10,9 +10,22 @@ document.addEventListener('click', function (e) {
     window.close();
   }
 });
-select.addEventListener('click', function () {
-  background.send('profile', this.value);
-  profile.textContent = this.value;
+// select
+(function (callback) {
+  let old = select.value;
+  function check () {
+    let value = select.value;
+    if (value !== old) {
+      old = value;
+      callback(value);
+    }
+  }
+  select.addEventListener('change', check);
+  select.addEventListener('click', check);
+})(function (value) {
+  console.error(value);
+  background.send('profile', value);
+  profile.textContent = value;
 });
 
 background.receive('show', function (obj) {

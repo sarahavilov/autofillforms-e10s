@@ -139,7 +139,8 @@ app.popup.receive('create-profile', function () {
     currentWindow: true
   }, (tabs) => tabs.forEach(tab => app.inject.send(tab.id, 'to-profile', {
     types: config.settings.types,
-    rules
+    rules,
+    profile: config.profiles.users.current
   })));
   app.popup.hide();
 });
@@ -209,7 +210,7 @@ trigger.on('update-profile', function () {
   build();
 });
 trigger.on('add-to-profile', function (obj) {
-  let current = config.profiles.users.current;
+  let current = obj.profile || config.profiles.users.current;
   let profile = config.profiles.getprofile(current);
   profile[obj.name] = obj.value;
   let tmp = {};
@@ -224,14 +225,14 @@ app.options.receive('add-to-profile', (obj) => {
   trigger.emit('add-to-profile', obj);
   trigger.emit('update-profile');
 });
-app.options.receive('delete-a-value', function (name) {
-  let current = config.profiles.users.current;
+trigger.on('delete-a-value', function (obj) {
+  let current = obj.profile || config.profiles.users.current;
   let profile = config.profiles.getprofile(current);
   let defaults = Object.keys(config.profiles.users.default);
-  delete profile[name];
+  delete profile[obj.name];
   // deleting a custom rule
-  if (defaults.indexOf(name) !== -1) {
-    config.profiles.addException(current, name);
+  if (defaults.indexOf(obj.name) !== -1) {
+    config.profiles.addException(current, obj.name);
   }
   let tmp = {};
   Object.keys(profile).forEach(function (key) {
@@ -240,6 +241,9 @@ app.options.receive('delete-a-value', function (name) {
     }
   });
   config.profiles.setprofile(current, tmp);
+});
+app.options.receive('delete-a-value', function (name) {
+  trigger.emit('delete-a-value', {name});
   sendProfile();
   build();
 });
@@ -257,7 +261,8 @@ app.options.receive('change-profile', (name) => {
   config.profiles.users.current = name;
   trigger.emit('profile');
 });
-app.options.receive('add-to-rules', function (obj) {
+
+trigger.on('add-to-rules', function (obj) {
   let rules = config.profiles.rules;
   if (rules[obj.name] && rules[obj.name]['site-rule'] === obj.site && rules[obj.name]['field-rule'] === obj.field) {
     config.profiles.setrule(obj.name, null, true);
@@ -268,12 +273,113 @@ app.options.receive('add-to-rules', function (obj) {
       'field-rule': obj.field
     });
   }
+});
+app.options.receive('add-to-rules', function (obj) {
+  trigger.emit('add-to-rules', obj);
   sendRules();
 });
 app.options.receive('delete-a-rule', function (name) {
   config.profiles.setrule(name, null, true);
   sendRules();
 });
+app.options.receive('export-all', function () {
+  let content = {};
+  content.rules = config.profiles.getrules();
+  content.profiles = {};
+  config.profiles.users.list.concat('default').forEach(function (profile) {
+    content.profiles[profile] = {
+      exceptions: config.profiles.getExceptions(profile),
+      profile: config.profiles.getprofile(profile)
+    };
+  });
+  app.options.send('download', {
+    name: 'all',
+    content
+  });
+});
+app.options.receive('export-rules', function () {
+  let content = {};
+  content.rules = config.profiles.getrules();
+  content.profiles = {};
+  app.options.send('download', {
+    name: 'rules',
+    content
+  });
+});
+app.options.receive('export-profiles', function () {
+  let content = {};
+  content.rules = {};
+  content.profiles = {};
+  config.profiles.users.list.concat('default').forEach(function (profile) {
+    content.profiles[profile] = {
+      exceptions: config.profiles.getExceptions(profile),
+      profile: config.profiles.getprofile(profile)
+    };
+  });
+  app.options.send('download', {
+    name: 'profiles',
+    content
+  });
+});
+app.options.receive('export-active', function () {
+  let content = {};
+  content.rules = config.profiles.getrules();
+  let exceptions = config.profiles.getExceptions();
+  exceptions.forEach(n => delete content.rules[n]);
+  content.profiles = {};
+  let profile = config.profiles.users.current;
+  content.profiles[profile] = {
+    exceptions,
+    profile: config.profiles.getprofile(profile)
+  };
+
+  app.options.send('download', {
+    name: 'active-user',
+    content
+  });
+});
+app.options.receive('import', function (content) {
+  if (!content) {
+    return;
+  }
+  content = JSON.parse(content);
+  // update rules
+  let rules = content.rules;
+  Object.keys(rules).forEach(function (name) {
+  trigger.emit('add-to-rules', {
+      name,
+      site: rules[name]['site-rule'],
+      field: rules[name]['field-rule']
+    });
+  });
+  let profiles = content.profiles;
+  // add users
+  config.profiles.users.list = config.profiles.users.list.concat(Object.keys(profiles))
+    .filter((n, i, l) => n && l.indexOf(n) === i && n !== 'default');
+  config.profiles.users.current = 'default';
+  // update profiles
+  Object.keys(profiles).forEach(function (profile) {
+    Object.keys(profiles[profile].profile).forEach(function (name) {
+      trigger.emit('add-to-profile', {
+        profile,
+        name,
+        value: profiles[profile].profile[name]
+      });
+    });
+    profiles[profile].exceptions.forEach(function (name) {
+      trigger.emit('delete-a-value', {
+        name,
+        profile
+      });
+    });
+  });
+  sendUsers();
+  sendProfile();
+  sendRules();
+  build();
+});
+
+
 // inject
 app.inject.receive('guess', function (tabID, obj) {
   let _rules = config.profiles.getrules();
