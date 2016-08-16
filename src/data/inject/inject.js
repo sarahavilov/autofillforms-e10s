@@ -105,7 +105,7 @@ background.receive('fill', function (obj) {
 
 // guess
 background.receive('find-rules', function (obj) {
-
+  console.error(obj);
   let types = new RegExp(obj.types);
   let rules = [];
   Array.from(document.forms).forEach(function (form) {
@@ -120,6 +120,7 @@ background.receive('find-rules', function (obj) {
           let rule = obj.rules[name];
           let t1 = (new RegExp(rule['site-rule'], 'i')).test(window.location.href);
           let t2 = (new RegExp(rule['field-rule'], 'i')).test(input.name);
+
           return t1 && t2;
         }).length;
       if (count === 0) {
@@ -128,8 +129,8 @@ background.receive('find-rules', function (obj) {
           field: input.name.replace(/([`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/])/gi, '\\$1')
         };
         obj.rules[input.name] = {
-          'site-rule': tmp.site,
-          'field-rule': tmp.filed
+          'site-rule': '',
+          'field-rule': tmp.field
         };
         rules.push(tmp);
       }
