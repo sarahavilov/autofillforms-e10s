@@ -177,11 +177,13 @@ document.addEventListener('change', function (e) {
 background.receive('download', function (obj) {
   let a = document.createElement('a');
   a.download = 'AutoFill-Forms-Exported-' + obj.name + '-' + (new Date()).toLocaleString().replace(/[\s\:\/]/g, '-').replace(',', '') + '.jon';
+  document.body.appendChild(a);
   let blob = new Blob([JSON.stringify(obj.content, null, 2)], {type : 'application/json'});
   let reader = new FileReader();
   reader.onload = function () {
     a.href = reader.result;
     a.click();
+    a.parentNode.removeChild(a);
   };
   reader.readAsDataURL(blob);
 });
