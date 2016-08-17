@@ -54,6 +54,7 @@ exports.popup = (function () {
   let popup = new Panel({
     contentURL: self.data.url('./popup/index.html'),
     contentScriptFile: [
+      self.data.url('./popup/fuse.js'),
       self.data.url('./popup/firefox/firefox.js'),
       self.data.url('./popup/index.js')
     ]
