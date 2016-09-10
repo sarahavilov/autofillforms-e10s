@@ -105,7 +105,6 @@ background.receive('fill', function (obj) {
 
 // guess
 background.receive('find-rules', function (obj) {
-  console.error(obj);
   let types = new RegExp(obj.types);
   let rules = [];
   Array.from(document.forms).forEach(function (form) {

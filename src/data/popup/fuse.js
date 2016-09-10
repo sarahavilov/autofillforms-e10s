@@ -772,7 +772,7 @@
     })
   } else {
     // Browser globals (root is window)
-    global.Fuse = Fuse
+    window.Fuse = Fuse
   }
 
 })(this)

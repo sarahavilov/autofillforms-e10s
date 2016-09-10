@@ -18,25 +18,26 @@ gulp.task('clean', function () {
   return gulp.src([
     'builds/unpacked/chrome/*',
     'builds/unpacked/firefox/*',
+    'builds/unpacked/safari/*',
   ], {read: false})
     .pipe(clean());
 });
 /* chrome build */
 gulp.task('chrome-build', function () {
-  gulp.src([
+  return gulp.src([
     'src/**/*'
   ])
   .pipe(gulpFilter(function (f) {
-    if (f.relative.indexOf('.DS_Store') !== -1 || f.relative.indexOf('Thumbs.db') !== -1) {
+    if (f.relative.endsWith('.DS_Store') || f.relative.endsWith('Thumbs.db')) {
       return false;
     }
-    if (f.relative.indexOf('firefox') !== -1 && f.relative.indexOf('firefox.png') === -1) {
+    if (f.relative.indexOf('firefox') !== -1 && !r.relative.endsWith('.png')) {
+      return false;
+    }
+    if (f.relative.indexOf('safari') !== -1 && !r.relative.endsWith('.png')) {
       return false;
     }
     if (f.path.indexOf('/locale') !== -1) {
-      return false;
-    }
-    if (f.relative.indexOf('safari') !== -1) {
       return false;
     }
     if (f.relative.split('/').length === 1) {
@@ -44,14 +45,7 @@ gulp.task('chrome-build', function () {
     }
     return true;
   }))
-  .pipe(gulpif(function (f) {
-    return f.path.indexOf('.js') !== -1 && f.path.indexOf('.json') === -1;
-  }, change(function (content) {
-    return content.replace(/\/\*\* wrapper[\s\S]*\\*\*\*\//m, '');
-  })))
-  .pipe(gulpif(function (f) {
-    return f.path.indexOf('.html') !== -1;
-  }, change(function (content) {
+  .pipe(gulpif(f => f.relative.endsWith('.html'), change(function (content) {
     return content.replace(/.*shadow_index\.js.*/, '    <script src="chrome/chrome.js"></script>\n    <script src="fuse.js"></script>\n    <script src="index.js"></script>');
   })))
   .pipe(gulp.dest('builds/unpacked/chrome'))
@@ -70,19 +64,19 @@ gulp.task('chrome-install', function () {
 
 /* firefox build */
 gulp.task('firefox-build', function () {
-  gulp.src([
+  return gulp.src([
     'src/**/*'
   ])
   .pipe(gulpFilter(function (f) {
-    if (f.relative.indexOf('.DS_Store') !== -1 || f.relative.indexOf('Thumbs.db') !== -1) {
+    if (f.relative.endsWith('.DS_Store') || f.relative.endsWith('Thumbs.db')) {
       return false;
     }
     if (f.path.indexOf('_locales') !== -1) {
       return false;
     }
     if (f.relative.indexOf('chrome') !== -1 &&
-      f.relative !== 'chrome.manifest' &&
-      f.relative.indexOf('chrome.png') === -1 &&
+      !f.relative.endsWith('.manifest') &&
+      !f.relative.endsWith('.png') &&
       f.relative.indexOf('firefox/chrome') === -1
     ) {
       return false;
@@ -98,16 +92,14 @@ gulp.task('firefox-build', function () {
     }
     return true;
   }))
-  .pipe(gulpif(function (f) {
-    return f.path.indexOf('.html') !== -1;
-  }, change(function (content) {
+  .pipe(gulpif(f => f.relative.endsWith('.html'), change(function (content) {
     return content.replace(/\n.*shadow_index\.js.*/, '');
   })))
   .pipe(gulp.dest('builds/unpacked/firefox'));
 });
 /* firefox pack */
 gulp.task('firefox-pack', function () {
-  gulp.src('')
+  return gulp.src('')
   .pipe(wait(1000))
   .pipe(shell([
     'jpm xpi',
@@ -122,10 +114,50 @@ gulp.task('firefox-pack', function () {
     cwd: './builds/packed'
   }));
 });
+/* safari build */
+gulp.task('safari-build', function () {
+  return gulp.src([
+    'src/**/*'
+  ])
+  .pipe(gulpFilter(function (f) {
+    if (f.relative.endsWith('.DS_Store') || f.relative.endsWith('Thumbs.db')) {
+      return false;
+    }
+    if (f.relative.indexOf('firefox') !== -1 && !f.relative.endsWith('.png')) {
+      return false;
+    }
+    if (f.relative.indexOf('chrome') !== -1 && !f.relative.endsWith('.png')) {
+      return false;
+    }
+    if (f.path.indexOf('/locale') !== -1) {
+      return false;
+    }
+    if (f.relative.split('/').length === 1) {
+      return f.relative === 'Icon-64.png' || f.relative.endsWith('.plist');
+    }
+    return true;
+  }))
+  .pipe(gulpif(f => f.relative.endsWith('.html'), change(function (content) {
+    return content.replace(/.*shadow_index\.js.*/, '    <script src="safari/safari.js"></script>\n    <script src="fuse.js"></script>\n    <script src="index.js"></script>');
+  })))
+  .pipe(gulpif(function (f) {
+    return f.path.endsWith('.js') &&
+      !f.relative.endsWith('EventEmitter.js') &&
+      !f.relative.endsWith('regtools.js')
+  }, babel({
+    presets: ['es2015']
+  })))
+  .pipe(gulp.dest('builds/unpacked/safari/src.safariextension'))
+  .pipe(zip('safari.zip'))
+  .pipe(gulp.dest('builds/packed'));
+});
 /* */
 gulp.task('chrome', function (callback) {
   runSequence('clean', 'chrome-build', 'chrome-install', callback);
 });
 gulp.task('firefox', function (callback) {
   runSequence('clean', 'firefox-build', 'firefox-pack', callback);
+});
+gulp.task('safari', function (callback) {
+  runSequence('clean', 'safari-build', callback);
 });

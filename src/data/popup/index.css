@@ -90,9 +90,10 @@ select:-moz-focusring {
 }
 #filling button,
 #filling select {
-  height: 100px;
+  height: 80px;
 }
 #filling button {
+  overflow: hidden;
   width: 140px;
   line-height: 16px;
 }
@@ -106,6 +107,7 @@ select:-moz-focusring {
   height: 30px;
   text-align: center;
   border-top: none;
+  -webkit-appearance: none;
 }
 
 #tools {

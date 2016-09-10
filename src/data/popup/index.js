@@ -35,6 +35,7 @@ document.addEventListener('click', function (e) {
 });
 
 background.receive('show', function (obj) {
+  console.error(obj);
   select.textContent = '';
   let list = ['default'].concat(obj.list);
   fuse = new Fuse(list);

@@ -35,7 +35,7 @@ function format (value) {
       value = e.message || e;
     }
   }
-  value = value.split(/(?:\\n)|(?:\<br\>)|(?:\<br\/\>)/).join('\n');
+  value = value.split(/(?:\\n)|(?:<br\>)|(?:<br\/\>)/).join('\n');
   return value;
 }
 
