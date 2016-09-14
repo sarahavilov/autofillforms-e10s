@@ -59,10 +59,6 @@ td:last-child {
 td:last-child {
   text-align: center;
 }
-td:last-child input {
-  font-family: "fontello";
-}
-
 tr.sticky td:first-child {
   color: #7f7f7f;
 }
@@ -110,4 +106,61 @@ tr.sticky td:first-child {
 input[type=text],
 .button {
   font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+.font {
+  font-family: "fontello";
+  font-style: normal;
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.profile-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+.profile-container>div {
+  border: solid 1px rgba(0, 0, 0, 0.1);
+  padding: 5px;
+  margin: 0 5px 5px 5px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  max-width: 100px;
+}
+.profile-container>div>span {
+  padding-right: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.profile-container>div[data-default=true] {
+  border-color: darkgoldenrod;
+}
+.profile-container>div[data-default=true]>span {
+  font-weight: bold;
+}
+.profile-container>div>div {
+  display: flex;
+  flex-direction: column;
+
+}
+.profile-container input[type=button] {
+  width: 18px;
+  height: 15px;
+  padding: 0;
+}
+.profile-container div[type=add] {
+  padding: 0;
+  border: none;
+}
+.profile-container div[type=add] input {
+  width: 60px;
+  height: 100%;
+  text-align: center;
+  font-size: 200%;
 }

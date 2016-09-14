@@ -109,6 +109,11 @@ select:-moz-focusring {
   border-top: none;
   -webkit-appearance: none;
 }
+#filling b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 #tools {
   display: flex;

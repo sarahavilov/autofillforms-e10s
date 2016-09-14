@@ -27,15 +27,20 @@
     </div>
     <div id="profiles">
       <h1>Profiles</h1>
-      <div>
-        Profile:
-        <select><option>default</option></select>
-        <input type="button" value="Add or Remove a profile" data-cmd="edit-users">
-        <input type="button" value="Reset removed rules list" title="This will clear exceptions list for the current profile; this will result to have all the default rules back" data-cmd="reset-exceptions">
+
+      <div class="profile-container">
+        <div data-cmd="change-profile" data-name="default">
+          <span>Default</span>
+          <div>
+            <input type="button" value="R" title="Rename this profile" data-cmd="rename-a-user">
+            <input type="button" value="D" title="Duplicate this profile" data-cmd="duplicate-a-user">
+            <input type="button" value="&#xe802;" class="font" title="Delete this profile" data-cmd="delete-a-user">
+          </div>
+        </div>
+        <div type="add">
+          <input type=button value="&#xe801;" class="font" data-cmd="add-a-user">
+        </div>
       </div>
-      <p class="note">
-        1: Currently selected profile is the default profile.
-      </p>
       <table data-id="profiles">
         <thead>
           <tr>
@@ -48,7 +53,7 @@
           <tr>
             <td></td>
             <td></td>
-            <td><input type="button" value="&#xe802;" data-cmd="delete-a-value"></td>
+            <td><input type="button" value="&#xe802;" data-cmd="delete-a-value" class="font"></td>
           </tr>
         </tbody>
       </table>
@@ -60,7 +65,7 @@
           <tr>
             <td><div class="hbox"><input data-type="name" type="text" placeholder="rule name" spellcheck="false" required></div></td>
             <td><div class="hbox"><input data-type="value" type="text" placeholder="value" spellcheck="false" required></div></td>
-            <td><input type="submit" value="&#xe801;"></td>
+            <td><input type="submit" value="&#xe801;" class="font"></td>
           </tr>
         </tbody>
       </table>
@@ -74,6 +79,11 @@
         Learn more how to use this feature <a href="https://github.com/cho45/String_random.js" target="_blank">here</a>.
       </p>
     </form>
+    <form>
+      <h2>Reset rules</h2>
+      <input type="button" value="Reset removed rules list" title="This will clear exceptions list for the current profile; this will result to have all the default rules back" data-cmd="reset-exceptions">
+    </form>
+
     <div>
       <h1>Rules</h1>
       <div id="rules">
@@ -91,7 +101,7 @@
               <td></td>
               <td></td>
               <td></td>
-              <td><input type="button" value="&#xe802;" data-cmd="delete-a-rule"></td>
+              <td><input type="button" value="&#xe802;" data-cmd="delete-a-rule" class="font"></td>
             </tr>
           </tbody>
         </table>
@@ -108,7 +118,7 @@
               <td><div class="hbox"><input data-type="name" type="text" placeholder="rule name" spellcheck="false" required></div></td>
               <td><div class="hbox"><input data-type="site" type="text" placeholder="site rule" spellcheck="false"></div></td>
               <td><div class="hbox"><input data-type="field" type="text" placeholder="field rule" spellcheck="false" required></div></td>
-              <td><input type="submit" value="&#xe801;"></td>
+              <td><input type="submit" value="&#xe801;" class="font"></td>
             </tr>
           </tbody>
         </table>

@@ -9,7 +9,7 @@ var elements = {
   },
   rules: document.querySelector('#rules tbody'),
   rule: document.querySelector('#rules tbody tr'),
-  select: document.querySelector('select'),
+  users: document.querySelector('.profile-container'),
   profiles: document.querySelector('#profiles tbody'),
   profile: document.querySelector('#profiles tbody tr'),
   edit: {
@@ -26,10 +26,6 @@ var elements = {
     },
   }
 };
-
-elements.select.addEventListener('change', function () {
-  background.send('change-profile', elements.select.value);
-});
 
 function profile (obj) {
   while (true) {
@@ -80,15 +76,27 @@ function rules (obj) {
 }
 
 function users (obj) {
-  elements.select.textContent = '';
-  ['default'].concat(obj.list).forEach(function (user, index) {
-    let option = document.createElement('option');
-    option.textContent = user;
-    elements.select.appendChild(option);
+  // clean up
+  while(elements.users.children.length > 2) {
+    elements.users.removeChild(elements.users.children[1]);
+  }
+  elements.users.children[0].querySelectorAll('input').forEach(i => i.disabled = false);
+  elements.users.children[0].dataset.default = false;
+  // generate
+  obj.list.forEach(function (user, index) {
+    let div = elements.users.children[0].cloneNode(true);
+    let span = div.querySelector('span');
+    div.dataset.name = span.textContent = span.title = user;
     if (user === obj.current) {
-      elements.select.selectedIndex = index;
+      div.dataset.default = true;
     }
+    elements.users.insertBefore(div, elements.users.children[index + 1]);
   });
+  // do not allow delete and rename on the default profile
+  if (obj.current === 'default') {
+    elements.users.children[0].dataset.default = true;
+  }
+  elements.users.children[0].querySelectorAll('input').forEach(i => i.disabled = i.dataset.cmd !== 'duplicate-a-user');
 }
 
 background.receive('password', obj => {
@@ -111,11 +119,13 @@ document.addEventListener('click', function (e) {
     elements.edit.rules.field.value = parent.dataset.field;
     elements.edit.rules.site.value = parent.dataset.site;
     elements.edit.rules.field.focus();
+    elements.edit.rules.field.select();
   }
   if (id === 'profiles' && parent.dataset.name && parent.dataset.value) {
     elements.edit.profiles.name.value = parent.dataset.name;
     elements.edit.profiles.value.value = parent.dataset.value;
     elements.edit.profiles.value.focus();
+    elements.edit.profiles.value.select();
   }
 });
 
@@ -123,15 +133,37 @@ document.addEventListener('click', function (e) {
   let target = e.target;
   let cmd = target.dataset.cmd;
 
-  if (cmd === 'edit-users') {
-    let users = window.prompt('Comma separated list of profiles:', Array.from(elements.select.options).map(e => e.value).join(', '));
-    background.send('edit-users', users);
-  }
-  else if (cmd === 'delete-a-rule') {
+  if (cmd === 'delete-a-rule') {
     background.send('delete-a-rule', target.parentNode.parentNode.dataset.name);
   }
   else if (cmd === 'delete-a-value') {
     background.send('delete-a-value', target.parentNode.parentNode.dataset.name);
+  }
+  else if (cmd === 'add-a-user') {
+    let user = window.prompt('Select a new for your new profile');
+    if (user) {
+      background.send('add-a-user', user);
+    }
+  }
+  else if (cmd === 'change-profile') {
+    background.send('change-profile', e.target.dataset.name);
+  }
+  else if (cmd === 'delete-a-user') {
+    let name = target.parentNode.parentNode.dataset.name;
+    if (window.confirm('Are you sure you want to delete "' + name + '" profile?')) {
+      background.send('delete-a-user', name);
+    }
+  }
+  else if (cmd === 'rename-a-user') {
+    let oldname = target.parentNode.parentNode.dataset.name;
+    let newname = window.prompt('Select a new name for "' + oldname + '" profile', oldname);
+    if (newname && newname !== oldname) {
+      background.send('rename-a-user', {oldname, newname});
+    }
+  }
+  else if (cmd === 'duplicate-a-user') {
+    let name = target.parentNode.parentNode.dataset.name;
+    background.send('duplicate-a-user', name);
   }
   else {
     background.send(cmd);

@@ -197,14 +197,46 @@ trigger.on('users', function () {
   sendUsers();
   sendProfile();
 });
-app.options.receive('edit-users', (name) => {
-  let users = name.split(/\s*\,\s*/);
-  users = users.filter((n, i, l) => n && l.indexOf(n) === i && n !== 'default');
-  config.profiles.users.list = users;
-  config.profiles.users.current = 'default';
-
+app.options.receive('add-a-user', (name) => {
+  let list = config.profiles.users.list.concat(name);
+  list = list.filter((n, i, l) => l.indexOf(n) === i);
+  config.profiles.users.list = list;
+  config.profiles.users.current = name;
   trigger.emit('users');
 });
+app.options.receive('delete-a-user', (name) => {
+  let list = config.profiles.users.list;
+  list = list.filter(n => n !== name);
+  config.profiles.users.list = list;
+  if (config.profiles.users.current === name) {
+    config.profiles.users.current = 'default';
+  }
+  trigger.emit('users');
+});
+app.options.receive('rename-a-user', (obj) => {
+  let list = config.profiles.users.list;
+  let profile = config.profiles.getprofile(obj.oldname);
+  list = list.map(n => n === obj.oldname ? obj.newname : n);
+  config.profiles.setprofile(obj.newname, profile);
+  config.profiles.users.list = list;
+  config.profiles.users.current = obj.newname;
+  trigger.emit('users');
+});
+app.options.receive('duplicate-a-user', (name) => {
+  let list = config.profiles.users.list;
+  let profile = config.profiles.getprofile(name);
+  let index = list.indexOf(name);
+  let newname = 'copy of ' + name;
+  while (list.indexOf(newname) !== -1) {
+    newname = 'copy of ' + newname;
+  }
+  list.splice(index + 1, 0, newname);
+  config.profiles.setprofile(newname, profile);
+  config.profiles.users.list = list;
+  config.profiles.users.current = newname;
+  trigger.emit('users');
+});
+
 trigger.on('update-profile', function () {
   sendProfile();
   build();

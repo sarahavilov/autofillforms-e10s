@@ -31,10 +31,10 @@ gulp.task('chrome-build', function () {
     if (f.relative.endsWith('.DS_Store') || f.relative.endsWith('Thumbs.db')) {
       return false;
     }
-    if (f.relative.indexOf('firefox') !== -1 && !r.relative.endsWith('.png')) {
+    if (f.relative.indexOf('firefox') !== -1 && !f.relative.endsWith('.png')) {
       return false;
     }
-    if (f.relative.indexOf('safari') !== -1 && !r.relative.endsWith('.png')) {
+    if (f.relative.indexOf('safari') !== -1 && !f.relative.endsWith('.png')) {
       return false;
     }
     if (f.path.indexOf('/locale') !== -1) {
@@ -46,7 +46,10 @@ gulp.task('chrome-build', function () {
     return true;
   }))
   .pipe(gulpif(f => f.relative.endsWith('.html'), change(function (content) {
-    return content.replace(/.*shadow_index\.js.*/, '    <script src="chrome/chrome.js"></script>\n    <script src="fuse.js"></script>\n    <script src="index.js"></script>');
+    return content.replace(/.*shadow_index\.js.*/, '    <script src="chrome/chrome.js"></script>\n    <script src="index.js"></script>');
+  })))
+  .pipe(gulpif(f => f.relative.endsWith('popup/index.html'), change(function (content) {
+    return content.replace('<script src="index.js"></script>', '<script src="fuse.js"></script>\n    <script src="index.js"></script>');
   })))
   .pipe(gulp.dest('builds/unpacked/chrome'))
   .pipe(zip('chrome.zip'))
