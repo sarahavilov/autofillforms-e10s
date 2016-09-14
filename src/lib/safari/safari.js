@@ -64,7 +64,8 @@ app.popup = (function () {
 app.contextMenus = (function () {
   let items = [];
   safari.application.addEventListener('contextmenu', (e) => {
-    if (e.userInfo === 'INPUT') {
+    // this method messes up the context menu as there is no parent menu available
+    if (e.userInfo === 'INPUT' && safari.extension.settings.contextmenu) {
       items.forEach((obj, i) => e.contextMenu.appendContextMenuItem('context/' + i, obj.title));
     }
   }, false);
@@ -91,6 +92,8 @@ app.contextMenus = (function () {
 
 app.notifications = {
   create: (id, props) => {
+    // in safari password generation opens up an alert box; there is no need for desktop notifications
+    return;
     let notification = window.webkitNotifications.createNotification(
       safari.extension.baseURI + props.iconUrl, props.title, props.message
     );
