@@ -419,13 +419,23 @@ app.inject.receive('guess', function (tabID, obj) {
 
   let rules = Object.keys(_rules).map(name => ({
     name,
-    field: new RegExp(_rules[name]['field-rule'], 'i'),
+    field: function (input) {
+      let exp = _rules[name]['field-rule'];
+      if (exp.startsWith('position:')) {
+        let index = input.index;
+        let formIndex = input.formIndex;
+        return exp === 'position:' + index + '/' + formIndex || exp === 'position:' + index;
+      }
+      else {
+        return (new RegExp(exp, 'i')).test(input.name);
+      }
+    },
     site: new RegExp(_rules[name]['site-rule'], 'i')
   }));
 
   let inputs = obj.inputs.map(function (input) {
     for (let n in rules) {
-      if (rules[n].field.test(input.name) && rules[n].site.test(obj.href)) {
+      if (rules[n].field(input) && rules[n].site.test(obj.href)) {
         return Object.assign(input, {rule: rules[n].name});
       }
     }

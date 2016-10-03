@@ -84,7 +84,8 @@ background.receive('guess', function (obj) {
 
 background.receive('fill', function (obj) {
   let types = new RegExp(obj.types);
-  Array.from(document.forms).forEach(function (form) {
+  let forms = Array.from(document.forms);
+  forms.forEach(function (form) {
     Array.from(form.querySelectorAll('[name]')).filter(input => types.test(input.type)).forEach(function (input) {
       if (inputs.indexOf(input) === -1) {
         inputs.push(input);
@@ -97,7 +98,8 @@ background.receive('fill', function (obj) {
       profile: obj.profile,
       inputs: inputs.map((input, index) => ({
         name: input.name,
-        index
+        index,
+        formIndex: forms.indexOf(input.closest('form'))
       }))
     });
   }

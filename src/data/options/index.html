@@ -70,11 +70,11 @@
         </tbody>
       </table>
       <p class="note">
-        1: To have multi-line value use "\n" between lines
+        1: To have multi-line value use <code>\n</code> between lines
         <br>
-        2: To generate a random string from a RegExp, surround the expression with "/"
+        2: To generate a random string from a RegExp, surround the expression with <code>/</code>
         <br>
-        e.g. to generate a random string of length 5 to 8 use /\w{5,8}/
+        e.g. to generate a random string of length 5 to 8 use <code>/\w{5,8}/</code>
         <br>
         Learn more how to use this feature <a href="https://github.com/cho45/String_random.js" target="_blank">here</a>.
       </p>
@@ -92,7 +92,7 @@
             <tr>
               <th>Rule Name</th>
               <th>Site Rule (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a>)</th>
-              <th>Field Rule (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a>)</th>
+              <th>Field Rule (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a> or <code>position:index</code>)</th>
               <th>Remove</th>
             </tr>
           </thead>
@@ -106,7 +106,9 @@
           </tbody>
         </table>
         <p class="note">
-          <b>Note: </b>Default rules cannot be deleted. Removing resets to the default value
+          1. Default rules cannot be deleted. Removing resets to the default value
+          <br>
+          2. <b>Field Rule</b> can be either a regular expression matching the name of the element or can be based on element's position. For instance <code>position:0/0</code> matches to the first element of the first form and <code>position:0</code> matches the first element of all forms in the page.
         </p>
       </div>
     </div>
