@@ -32,16 +32,12 @@ config.profiles = {
       'field-rule': '(?:(?:username)|(?:login)|(?:membername))(?!\\w*pass)',
       'site-rule': '(?:)'
     },
-    'email': {
-      'field-rule': '(?:mail)|(?:id)',
-      'site-rule': '(?:)'
-    },
     'title': {
       'field-rule': '(?:prefix\\w*name)|(?:name\\w*prefix)|(?:title)',
       'site-rule': '(?:)'
     },
     'gender': {
-      'field-rule': '(?:gender)',
+      'field-rule': '(?:gender)|(?:sex)',
       'site-rule': '(?:)'
     },
     'first-name': {
@@ -54,6 +50,10 @@ config.profiles = {
     },
     'last-name': {
       'field-rule': '(?:last\\w*name)|(?:name\\w*last)',
+      'site-rule': '(?:)'
+    },
+    'email': {
+      'field-rule': '(?:mail)|(?:id)',
       'site-rule': '(?:)'
     },
     'name-suffix': {
@@ -104,6 +104,10 @@ config.profiles = {
       'field-rule': 'lang',
       'site-rule': '(?:)'
     },
+    'age': {
+      'field-rule': 'age',
+      'site-rule': '(?:)'
+    },
     'birth-day-type-1': {
       'field-rule': '(?:dd)|(?:bday)|(?:birth\\w?day)|(?:dob\\w?day)|(?:birth\\w*1)',
       'site-rule': '(?:)'
@@ -137,7 +141,7 @@ config.profiles = {
       'site-rule': '(?:)'
     },
     'phone': {
-      'field-rule': '(?:phone)|(?:tel)',
+      'field-rule': '(?:phone)|(?:tel)|(?:phon)',
       'site-rule': '(?:)'
     },
     'homepage': {
@@ -151,6 +155,7 @@ config.profiles = {
       'email': 'me@mydomain.com',
       'title': 'Mr.',
       'gender': 'male',
+      'age': '30',
       'first-name': 'my first name',
       'middle-name': 'my middle name',
       'last-name': 'my last name',

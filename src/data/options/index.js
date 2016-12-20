@@ -27,6 +27,29 @@ var elements = {
   }
 };
 
+var activeElement;
+document.addEventListener('transitionend', (e) => {
+  e.target.classList.remove('highlight');
+}, false);
+
+function isVisisble (el) {
+  let elemTop = el.getBoundingClientRect().top;
+  let elemBottom = el.getBoundingClientRect().bottom;
+
+  return (elemTop >= 0) && (elemBottom <= window.innerHeight);
+}
+
+function highlight () {
+  try {
+    let element = elements[activeElement.id].querySelector(`[data-name="${activeElement.name}"]`);
+    element.classList.add('highlight');
+    if (!isVisisble(element)) {
+      element.scrollIntoView();
+    }
+  }
+  catch (e) {}
+}
+
 function profile (obj) {
   while (true) {
     let tr =  elements.profiles.querySelector('tr:nth-child(2)');
@@ -48,6 +71,7 @@ function profile (obj) {
   });
   elements.edit.profiles.name.value = '';
   elements.edit.profiles.value.value = '';
+  highlight();
 }
 
 function rules (obj) {
@@ -73,6 +97,7 @@ function rules (obj) {
   elements.edit.rules.name.value = '';
   elements.edit.rules.site.value = '';
   elements.edit.rules.field.value = '';
+  highlight();
 }
 
 function users (obj) {
@@ -120,12 +145,20 @@ document.addEventListener('click', function (e) {
     elements.edit.rules.site.value = parent.dataset.site;
     elements.edit.rules.field.focus();
     elements.edit.rules.field.select();
+    activeElement = {
+      id,
+      name: parent.dataset.name
+    };
   }
-  if (id === 'profiles' && parent.dataset.name && parent.dataset.value) {
+  else if (id === 'profiles' && parent.dataset.name && parent.dataset.value) {
     elements.edit.profiles.name.value = parent.dataset.name;
     elements.edit.profiles.value.value = parent.dataset.value;
     elements.edit.profiles.value.focus();
     elements.edit.profiles.value.select();
+    activeElement = {
+      id,
+      name: parent.dataset.name
+    };
   }
 });
 
@@ -172,7 +205,7 @@ document.addEventListener('click', function (e) {
 document.addEventListener('change', function (e) {
   let target = e.target;
   let files = target.files;
-  if (files.length) {
+  if (files && files.length) {
     let reader = new FileReader();
     reader.onload = function () {
       background.send(target.dataset.cmd, reader.result);
@@ -208,7 +241,7 @@ document.addEventListener('change', function (e) {
 
 background.receive('download', function (obj) {
   let a = document.createElement('a');
-  a.download = 'AutoFill-Forms-Exported-' + obj.name + '-' + (new Date()).toLocaleString().replace(/[\s\:\/]/g, '-').replace(',', '') + '.jon';
+  a.download = 'AutoFill-Forms-Exported-' + obj.name + '-' + (new Date()).toLocaleString().replace(/[\s\:\/]/g, '-').replace(',', '') + '.json';
   document.body.appendChild(a);
   let blob = new Blob([JSON.stringify(obj.content, null, 2)], {type : 'application/json'});
   let reader = new FileReader();

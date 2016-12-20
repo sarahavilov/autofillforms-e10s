@@ -15,29 +15,59 @@ app.notifications = chrome.notifications;
 app.extension = chrome.extension;
 app.contextMenus = chrome.contextMenus;
 
-app.version = chrome.runtime.getManifest().version;
+app.version = function () {
+  return chrome.runtime.getManifest().version;
+};
 
-app.storage = (function () {
-  let objs = {};
-  let callbacks = {};
-  chrome.storage.local.get(null, (o) => objs = o);
-  return {
-    read: (id) => objs[id],
-    write: (id, data) => {
-      if (objs[id] === data) {
-        return;
-      }
-      objs[id] = data;
-      let tmp = {};
-      tmp[id] = data;
-      chrome.storage.local.set(tmp, function () {});
-      (callbacks[id] || []).forEach(c => c(data));
-    },
-    on: function (name, callback) {
-      callbacks[name] = callbacks[name] || [];
-      callbacks[name].push(callback);
+(function () {
+  let loadReason, callback = function () {}, ready = false;
+
+  function check () {
+    if ((loadReason === 'startup' || loadReason === 'install') && ready) {
+      callback();
+      callback = function () {};
     }
+  }
+  chrome.runtime.onInstalled.addListener(function (details) {
+    loadReason = details.reason;
+    check();
+  });
+  chrome.runtime.onStartup.addListener(function () {
+    loadReason = 'startup';
+    check();
+  });
+
+  app.startup = (c) => {
+    callback = c;
+    check();
   };
+  // storage
+  app.storage = (function () {
+    let objs = {};
+    let callbacks = {};
+    chrome.storage.local.get(null, (o) => {
+      objs = o;
+      ready = true;
+      check();
+    });
+    return {
+      read: (id) => objs[id],
+      write: (id, data) => {
+        if (objs[id] === data) {
+          return;
+        }
+        objs[id] = data;
+        let tmp = {};
+        tmp[id] = data;
+        chrome.storage.local.set(tmp, function () {});
+        (callbacks[id] || []).forEach(c => c(data));
+      },
+      on: function (name, callback) {
+        callbacks[name] = callbacks[name] || [];
+        callbacks[name].push(callback);
+      }
+    };
+  })();
 })();
 
 app.inject = (function () {
@@ -63,34 +93,13 @@ app.popup = {
 
 app.clipboard = {
   write: (str) => {
-    document.oncopy = function(event) {
+    document.oncopy = function (event) {
       event.clipboardData.setData('text/plain', str);
       event.preventDefault();
     };
     document.execCommand('Copy', false, null);
   }
 };
-
-app.startup = (function () {
-  let loadReason, callback = function () {};
-  function check () {
-    if (loadReason === 'startup' || loadReason === 'install') {
-      callback();
-    }
-  }
-  chrome.runtime.onInstalled.addListener(function (details) {
-    loadReason = details.reason;
-    check();
-  });
-  chrome.runtime.onStartup.addListener(function () {
-    loadReason = 'startup';
-    check();
-  });
-  return (c) => {
-    callback = c;
-    check();
-  };
-})();
 
 app.options = (function () {
   let url = chrome.extension.getURL('data/options/index.html');

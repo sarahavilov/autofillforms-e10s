@@ -9,7 +9,7 @@
   </head>
   <body>
     <div>
-      <h1>General Settings</h1>
+      <h1 id="p0">General Settings</h1>
       <table id="general">
         <tr>
           <td>Acceptable input types (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a>):</td>
@@ -26,7 +26,7 @@
       </table>
     </div>
     <div id="profiles">
-      <h1>Profiles</h1>
+      <h1 id="p1">Profiles</h1>
 
       <div class="profile-container">
         <div data-cmd="change-profile" data-name="default">
@@ -69,15 +69,20 @@
           </tr>
         </tbody>
       </table>
-      <p class="note">
+      <div class="note">
         1: To have multi-line value use <code>\n</code> between lines
         <br>
-        2: To generate a random string from a RegExp, surround the expression with <code>/</code>
+        2: Reserved words:
+        <ul>
+          <li><code>_url_</code>: will be replaced by frame/page url</li>
+          <li><code>_host_</code>: will be replaced by frame/page host name</li>
+        </ul>
+        3: To generate a random string from a RegExp, surround the expression with <code>/</code>
         <br>
         e.g. to generate a random string of length 5 to 8 use <code>/\w{5,8}/</code>
         <br>
         Learn more how to use this feature <a href="https://github.com/cho45/String_random.js" target="_blank">here</a>.
-      </p>
+      </div>
     </form>
     <form>
       <h2>Reset rules</h2>
@@ -85,7 +90,7 @@
     </form>
 
     <div>
-      <h1>Rules</h1>
+      <h1 id="p2">Rules</h1>
       <div id="rules">
         <table data-id="rules">
           <thead>
@@ -108,7 +113,7 @@
         <p class="note">
           1. Default rules cannot be deleted. Removing resets to the default value
           <br>
-          2. <b>Field Rule</b> can be either a regular expression matching the name of the element or can be based on element's position. For instance <code>position:0/0</code> matches to the first element of the first form and <code>position:0</code> matches the first element of all forms in the page.
+          2. <b>Field Rule</b> can be either a regular expression matching the name of the element or can be based on element's position. For instance <code>position:0/1</code> matches to the first element of the second form and <code>position:0</code> matches the first element of all forms in the page.
         </p>
       </div>
     </div>
@@ -126,7 +131,7 @@
         </table>
     </form>
     <div>
-      <h2>Import/Export</h2>
+      <h1 id="p3">Import &amp; Export</h1>
       <div>
         <input type="button" data-cmd="export-all" value="Export all (profiles and rules)">
         <input type="button" data-cmd="export-rules" value="Export all rules">

@@ -14,6 +14,12 @@ code {
   border-radius: 3px;
 }
 
+h1 {
+  font-family: arial,sans-serif;
+  background: #ddd;
+  padding: 5px;
+}
+
 .hbox {
   display: flex;
   flex-direction: row;
@@ -90,6 +96,7 @@ tr.sticky td:first-child {
   border: solid 1px #a5a860;
   background-color: #cdd077;
   padding: 5px;
+  margin: 5px 0;
 }
 .button {
   border: solid 1px rgba(0, 0, 0, 0.1);
@@ -171,4 +178,16 @@ input[type=text],
   height: 100%;
   text-align: center;
   font-size: 200%;
+}
+
+.highlight {
+  animation: highlight 3s;
+}
+@keyframes highlight {
+  0% {
+    background: #ffe460;
+  }
+  100% {
+    background: transparent;
+  }
 }

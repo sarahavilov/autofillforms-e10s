@@ -5,7 +5,9 @@ var app = {};
 var config = {};  // jshint ignore:line
 var regtools = {};  // jshint ignore:line
 
-app.version = safari.extension.displayVersion;
+app.version = function () {
+  return safari.extension.displayVersion;
+};
 
 app.timers = window;
 

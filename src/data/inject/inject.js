@@ -13,10 +13,15 @@ var context = null;
 (function (callback) {
   try {
     document.addEventListener('contextmenu', callback, true);
-    app.unload(() => document.removeEventListener('contextmenu', callback));
+    app.unload(() => {
+      try {
+        document.removeEventListener('contextmenu', callback);
+      }
+      catch (e) {}
+    });
   }
   catch (e) {}
-})(function(e) {
+})(function (e) {
   context = e.target;
 });
 
@@ -71,8 +76,11 @@ background.receive('guess', function (obj) {
       });
     }
     else {
+      // replacing keywords
+      element.value = input.value.
+        replace(/\_url\_/g, document.location.href).
+        replace(/\_host\_/g, document.location.hostname);
       // supporting multi-line input boxes
-      element.value = input.value;
       try {
         element.selectionStart = element.selectionEnd = input.value.length;
       }
@@ -114,6 +122,8 @@ background.receive('find-rules', function (obj) {
     .filter(input => types.test(input.type))
     // checkbox
     .filter(input => input.type === 'checkbox' ? input.checked : true)
+    // textbox
+    .filter(input => input.type === 'text' ? input.value : true)
     .forEach(function (input) {
       // only add rule is non of existing ones is a match
       let count = Object.keys(obj.rules)

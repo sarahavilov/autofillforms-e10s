@@ -14,7 +14,9 @@ var self = require('sdk/self'),
     {ToggleButton} = require('sdk/ui/button/toggle'),
     {Panel} = require('sdk/panel');
 
-exports.version = self.version;
+exports.version = function () {
+  return self.version;
+};
 
 var button = new ToggleButton({
   id: self.name,

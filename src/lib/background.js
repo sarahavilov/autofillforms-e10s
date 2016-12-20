@@ -378,7 +378,7 @@ app.options.receive('import', function (content) {
   // update rules
   let rules = content.rules;
   Object.keys(rules).forEach(function (name) {
-  trigger.emit('add-to-rules', {
+    trigger.emit('add-to-rules', {
       name,
       site: rules[name]['site-rule'],
       field: rules[name]['field-rule']
@@ -410,7 +410,6 @@ app.options.receive('import', function (content) {
   sendRules();
   build();
 });
-
 
 // inject
 app.inject.receive('guess', function (tabID, obj) {
@@ -477,15 +476,15 @@ app.inject.receive('generated-values', function (tabID, obj) {
 app.inject.receive('notify', (tabID, msg) => notify(msg));
 /* startup */
 app.startup(function () {
-  // FAQs page
   let version = config.welcome.version;
-  if (app.version !== version) {
-    app.timers.setTimeout(function () {
+  let cv = app.version();
+  if (cv !== version) {
+    app.timers.setTimeout(() => {
       app.tabs.create({
-        url: 'http://add0n.com/autofillforms-e10s.html?v=' + app.version +
+        url: 'http://add0n.com/autofillforms-e10s.html?v=' + cv +
         (version ? '&p=' + version + '&type=upgrade' : '&type=install')
       });
-      config.welcome.version = app.version;
+      config.welcome.version = cv;
     }, config.welcome.timeout);
   }
 });
