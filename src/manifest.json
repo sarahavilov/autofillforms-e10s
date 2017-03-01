@@ -43,5 +43,13 @@
     "run_at": "document_start",
     "all_frames": true
   }],
+  "commands": {
+    "activate": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U"
+      },
+      "description": "Activate extension"
+    }
+  },
   "options_page": "data/options/index.html"
 }

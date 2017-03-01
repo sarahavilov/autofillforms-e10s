@@ -67,7 +67,11 @@ app.timers.setTimeout(build, 3000);
 app.storage.on('rules', build);
 
 // popup
-app.popup.receive('fill-forms', function () {
+(function (onCommand) {
+  chrome.commands.onCommand.addListener(onCommand);
+  app.popup.receive('fill-forms', onCommand);
+})(function () {
+  console.log('called');
   app.tabs.query({
     active: true,
     currentWindow: true
@@ -77,6 +81,7 @@ app.popup.receive('fill-forms', function () {
   })));
   app.popup.hide();
 });
+
 app.popup.receive('show', () => app.popup.send('show', {
   list: config.profiles.users.list,
   current: config.profiles.users.current
