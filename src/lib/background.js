@@ -426,7 +426,8 @@ app.inject.receive('guess', function (tabID, obj) {
         return exp === 'position:' + index + '/' + formIndex || exp === 'position:' + index;
       }
       else {
-        return (new RegExp(exp, 'i')).test(input.name);
+        let r = (new RegExp(exp, 'i'));
+        return r.test(input.name) || r.test(input.textContent);
       }
     },
     site: new RegExp(_rules[name]['site-rule'], 'i')

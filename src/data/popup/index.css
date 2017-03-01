@@ -52,6 +52,10 @@ select:-moz-focusring {
   text-shadow: 0 0 0 #000;
 }
 
+button * {
+  pointer-events: none;
+}
+
 #toolbar {
   display: flex;
   flex-direction: row;

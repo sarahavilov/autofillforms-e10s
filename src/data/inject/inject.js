@@ -100,12 +100,14 @@ background.receive('fill', function (obj) {
       }
     });
   });
+
   if (inputs.length) {
     background.send('guess', {
       href: document.location.href,
       profile: obj.profile,
       inputs: inputs.map((input, index) => ({
         name: input.name,
+        textContent: input.textContent || input.parentNode.textContent || input.parentNode.parentNode.textContent,
         index,
         formIndex: forms.indexOf(input.closest('form'))
       }))
