@@ -3,14 +3,16 @@
   "short_name": "iafforms",
   "description": "One click form filler that supports multiple profiles",
   "author": "Sarah Avilov",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "manifest_version": 2,
   "permissions": [
     "storage",
     "tabs",
     "notifications",
     "clipboardWrite",
-    "contextMenus"
+    "contextMenus",
+    "<all_urls>",
+    "downloads"
   ],
   "browser_action": {
     "default_icon": {
@@ -21,9 +23,8 @@
   },
   "background": {
     "scripts": [
-      "lib/chrome/chrome.js",
-      "lib/config.js",
       "lib/regtools.js",
+      "lib/defaults.js",
       "lib/background.js"
     ]
   },
@@ -37,7 +38,6 @@
     "match_about_blank": true,
     "matches": ["<all_urls>"],
     "js": [
-      "data/inject/chrome/chrome.js",
       "data/inject/inject.js"
     ],
     "run_at": "document_start",
@@ -51,5 +51,8 @@
       "description": "Activate extension"
     }
   },
-  "options_page": "data/options/index.html"
+  "options_ui": {
+    "page": "data/options/index.html",
+    "chrome_style": true
+  }
 }

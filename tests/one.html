@@ -3,11 +3,27 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>Sample Form</title>
+    <style>
+      body {
+        font-family: "Helvetica Neue",Helvetica,sans-serif;
+        font-size: 13px;
+      }
+      iframe {
+        width: 300px;
+        height: 500px;
+      }
+    </style>
   </head>
   <body>
     <form>
       <h3>type=text</h3>
-      First name: <input type="text" name="firstname">, Last name: <input type="text" name="lastname">
+      <div>
+        First name: <input type="text" name="firstname">
+      </div>
+      <div>
+        Last name: <input type="text" name="lastname">
+      </div>
+
       <h3>type=radio</h3>
       <input type="radio" name="gender" value="male" checked> Male<br>
       <input type="radio" name="gender" value="female"> Female<br>
@@ -23,5 +39,6 @@
         <option value="audi">Audi</option>
       </select>
     </form>
+    <iframe src="iframe.html"></iframe>
   </body>
 </html>

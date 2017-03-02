@@ -1,5 +1,5 @@
 // From https://github.com/cho45/String_random.js
-var regtools = regtools || exports;
+var regtools = {};
 
 regtools.gen = function (pattern) {
 	if (pattern instanceof RegExp) pattern = pattern.source;

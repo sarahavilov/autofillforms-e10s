@@ -2,151 +2,139 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Settings - AutoFill Forms</title>
-    <link rel="stylesheet" href="fontello.css">
+    <title>AutoFill Forms :: Options</title>
     <link rel="stylesheet" href="index.css">
-    <link rel="shortcut icon" href="../icons/32.png">
   </head>
-  <body>
-    <div>
-      <h1 id="p0">General Settings</h1>
-      <table id="general">
-        <tr>
-          <td>Acceptable input types (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a>):</td>
-          <td><div class="hbox"><input data-pref="types" type="text" spellcheck="false"></div></td>
-        </tr>
-        <tr>
-          <td>Password generation charset:</td>
-          <td><div class="hbox"><input data-pref="password.charset" type="text" spellcheck="false"></div></td>
-        </tr>
-        <tr>
-          <td>Password generation length:</td>
-          <td><div class="hbox"><input data-pref="password.length" type="number" min=5 max="30"></div></td>
-        </tr>
-      </table>
+  <body vbox>
+    <div id="tabs">
+      <span data-index="1">General Settings</span>
+      <span data-index="2" data-active=true>Profiles</span>
+      <span data-index="3">Rules</span>
     </div>
-    <div id="profiles">
-      <h1 id="p1">Profiles</h1>
-
-      <div class="profile-container">
-        <div data-cmd="change-profile" data-name="default">
-          <span>Default</span>
-          <div>
-            <input type="button" value="R" title="Rename this profile" data-cmd="rename-a-user">
-            <input type="button" value="D" title="Duplicate this profile" data-cmd="duplicate-a-user">
-            <input type="button" value="&#xe802;" class="font" title="Delete this profile" data-cmd="delete-a-user">
-          </div>
-        </div>
-        <div type="add">
-          <input type=button value="&#xe801;" class="font" data-cmd="add-a-user">
-        </div>
-      </div>
-      <table data-id="profiles">
-        <thead>
-          <tr>
-            <th>Rule Name</th>
-            <th>Rule Value</th>
-            <th>Remove</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td></td>
-            <td></td>
-            <td><input type="button" value="&#xe802;" data-cmd="delete-a-value" class="font"></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <form id="edit-profiles">
-      <h2>Add/edit a value</h2>
-      <table>
-        <tbody>
-          <tr>
-            <td><div class="hbox"><input data-type="name" type="text" placeholder="rule name" spellcheck="false" required></div></td>
-            <td><div class="hbox"><input data-type="value" type="text" placeholder="value" spellcheck="false" required></div></td>
-            <td><input type="submit" value="&#xe801;" class="font"></td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="note">
-        1: To have multi-line value use <code>\n</code> between lines
-        <br>
-        2: Reserved words:
-        <ul>
-          <li><code>_url_</code>: will be replaced by frame/page url</li>
-          <li><code>_host_</code>: will be replaced by frame/page host name</li>
-        </ul>
-        3: To generate a random string from a RegExp, surround the expression with <code>/</code>
-        <br>
-        e.g. to generate a random string of length 5 to 8 use <code>/\w{5,8}/</code>
-        <br>
-        Learn more how to use this feature <a href="https://github.com/cho45/String_random.js" target="_blank">here</a>.
-      </div>
-    </form>
-    <form>
-      <h2>Reset rules</h2>
-      <input type="button" value="Reset removed rules list" title="This will clear exceptions list for the current profile; this will result to have all the default rules back" data-cmd="reset-exceptions">
-    </form>
-
-    <div>
-      <h1 id="p2">Rules</h1>
-      <div id="rules">
-        <table data-id="rules">
-          <thead>
-            <tr>
-              <th>Rule Name</th>
-              <th>Site Rule (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a>)</th>
-              <th>Field Rule (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a> or <code>position:index</code>)</th>
-              <th>Remove</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td><input type="button" value="&#xe802;" data-cmd="delete-a-rule" class="font"></td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="note">
-          1. Default rules cannot be deleted. Removing resets to the default value
-          <br>
-          2. <b>Field Rule</b> can be either a regular expression matching the name of the element or can be based on element's position. For instance <code>position:0/1</code> matches to the first element of the second form and <code>position:0</code> matches the first element of all forms in the page.
-        </p>
-      </div>
-    </div>
-    <form id="edit-rules">
-        <h2>Add/edit a Rule</h2>
+    <div id="panels" flex=1 vbox>
+      <div data-index="1">
         <table>
-          <tbody>
-            <tr>
-              <td><div class="hbox"><input data-type="name" type="text" placeholder="rule name" spellcheck="false" required></div></td>
-              <td><div class="hbox"><input data-type="site" type="text" placeholder="site rule" spellcheck="false"></div></td>
-              <td><div class="hbox"><input data-type="field" type="text" placeholder="field rule" spellcheck="false" required></div></td>
-              <td><input type="submit" value="&#xe801;" class="font"></td>
-            </tr>
-          </tbody>
+          <colgroup>
+            <col width="200">
+            <col>
+          </colgroup>
+          <tr>
+            <td>Acceptable input types (<a target="_blank" href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a>)</td>
+            <td hbox><input type="text" id="types" flex=1></td>
+          </tr>
+          <tr>
+            <td>Password generation charset</td>
+            <td hbox><input type="text" id="password.charset" flex=1></td>
+          </tr>
+          <tr>
+            <td>Password generation length</td>
+            <td hbox><input type="text" id="password.length" flex=1></td>
+          </tr>
+          <tr>
+            <td>Import settings (this will <b>overwrites</b> the current settings)</td>
+            <td><input type="file" value="Import" data-cmd="import"></td>
+          </tr>
+          <tr>
+            <td>Export saved settings</td>
+            <td><input type="button" value="Export" data-cmd="export"></td>
+          </tr>
         </table>
-    </form>
-    <div>
-      <h1 id="p3">Import &amp; Export</h1>
-      <div>
-        <input type="button" data-cmd="export-all" value="Export all (profiles and rules)">
-        <input type="button" data-cmd="export-rules" value="Export all rules">
-        <input type="button" data-cmd="export-profiles" value="Export all profiles">
-        <input type="button" data-cmd="export-active" value="Export only the active profile">
-        -
-        <label class="button">Import (append)
-          <input data-cmd="import" type="file">
-        </label>
       </div>
-      <p class="note">
-        <b>Note: </b>For the extension to work on another machine, rules and at least a single profile need to be imported.
-      </p>
+      <div data-index="2" data-active=true vbox flex=1>
+        <div hbox align=center space=2 style="padding-bottom: 5px;">
+          Profile
+          <select id="users" flex=1></select>
+          <input type="button" value="Duplicate" data-cmd="duplicate">
+          <input type="button" value="Delete" data-cmd="delete" disabled="true">
+          <input type="button" value="Rename" data-cmd="rename" disabled="true">
+          <input type="text" placeholder="new name" id="rename">
+        </div>
+        <div flex=1 style="overflow: auto;" hbox id="profile">
+          <template>
+            <tr>
+              <td><input type="text" value="" placeholder="mandatory"></td>
+              <td><input type="text" value="" placeholder="mandatory"></td>
+              <td><input type="button" value="x" data-cmd="delete-row"></td>
+            </tr>
+          </template>
+          <table class=editable flex=1>
+            <colgroup>
+              <col width="100"></col>
+              <col></col>
+              <col width=20></col>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Rule Name</th>
+                <th>Rule Value</th>
+                <th>Remove</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div hbox pack=end style="padding: 5px 0;">
+          <input type="button" value="Add a new Value" data-cmd="add-a-value">
+        </div>
+        <div class="notes">
+          <ul>
+            <li>To have a multi-line value, insert <code>\n</code> code between lines</li>
+            <li>Reserved words:
+              <ul>
+                <li><code>_url_</code>: will be replaced by the page url</li>
+                <li><code>_host_</code>: will be replaced by frame/page host name</li>
+              </ul>
+            </li>
+            <li>To generate a random string from a RegExp, surround the expression with <code>/</code> char<br>e.g. to generate a random string of length 5 to 8 use <code>/\w{5,8}/</code>. <a href="https://github.com/cho45/String_random.js" target="_blank">Learn more</a> how to use this feature.
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div data-index="3" vbox flex=1>
+        <div flex=1 style="overflow: auto;" hbox>
+          <table class=editable flex=1>
+            <colgroup>
+              <col width="100"></col>
+              <col width="100"></col>
+              <col></col>
+              <col width=20></col>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Rule Name</th>
+                <th>Site Rule</th>
+                <th>Field Rule (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a> or position:index)</th>
+                <th>Remove</th>
+              </tr>
+            </thead>
+            <tbody id="rules">
+              <template>
+                <tr>
+                  <td><input type="text" value="" placeholder="mandatory"></td>
+                  <td><input type="text" value="" placeholder="(?:)"></td>
+                  <td><input type="text" value="" placeholder="mandatory"></td>
+                  <td><input type="button" value="x" data-cmd="delete-row"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <div hbox pack=end style="padding: 5px 0;">
+          <input type="button" value="Add a new Rule" data-cmd="add-a-rule">
+        </div>
+        <div class="notes">
+          <ul>
+             <li>Default rules cannot be deleted. Removing resets to the default value</li>
+             <li><b>Field Rule</b> can be either a regular expression matching the name of the element or can be based on element's position. For instance <code>position:0/1</code> matches to the first element of the second form and <code>position:0</code> matches the first element of all forms in the page.</li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <script src="chrome/chrome.js"></script>
+    <div id="save" hbox pack="end" align="center">
+      <input type="button" value="Save" data-cmd="save">
+      <span id="info"></span>
+    </div>
+    <script src="/lib/defaults.js"></script>
     <script src="index.js"></script>
   </body>
 </html>

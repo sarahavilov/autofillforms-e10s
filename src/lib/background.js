@@ -1,496 +1,209 @@
+/* globals defaults */
 'use strict';
 
-var app = app || require('./firefox/firefox');
-var config = config || require('./config');
-var regtools = regtools || require('./regtools');
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  let name = info.menuItemId;
+  defaults.utils.getProfile(null, profile => {
+    let value = profile[name] || name;
+    value = defaults.utils.format(value);
 
-var EventEmitter = function () {
-  this.callbacks = {};
-};
-EventEmitter.prototype.on = function (name, callback) {
-  this.callbacks[name] = this.callbacks[name] || [];
-  this.callbacks[name].push(callback);
-};
-EventEmitter.prototype.emit = function (name, value) {
-  (this.callbacks[name] || []).forEach(c => c(value));
-};
-var trigger = new EventEmitter();
-
-function notify (message) {
-  app.notifications.create(null, {
-    type: 'basic',
-    iconUrl: './data/icons/48.png',
-    title: 'AutoFill Forms',
-    message
-  });
-}
-
-function format (value) {
-  let tmp = /^\/(.+)\/[gimuy]*$/.exec(value);
-  if (tmp && tmp.length) {
-    try {
-      value = regtools.gen(tmp[1]);
-    }
-    catch (e) {
-      value = e.message || e;
-    }
-  }
-  value = value.split(/(?:\\n)|(?:<br\>)|(?:<br\/\>)/).join('\n');
-  return value;
-}
-
-function contextmenu (name) {
-  let value = config.profiles.getprofile()[name] || name;
-  value = format(value);
-  app.tabs.query({
-    active: true,
-    currentWindow: true
-  }, (tabs) => tabs.forEach(tab => app.inject.send(tab.id, 'contextmenu', value)));
-}
-
-var build = (function () {
-  let ids = [];
-  return function () {
-    ids.forEach(id => app.contextMenus.remove(id));
-    ids = [];
-    Object.keys(config.profiles.getprofile()).sort().forEach(function (title) {
-      ids.push(app.contextMenus.create({
-        title,
-        contexts: ['editable'],
-        onclick: contextmenu.bind(app, title)
-      }));
+    chrome.tabs.executeScript(tab.id, {
+      'frameId': info.frameId,
+      'runAt': 'document_start',
+      'allFrames': true,
+      'code': `
+        if (context) {
+          context.value = '${value}';
+          try {
+            context.selectionStart = context.selectionEnd = request.value.length;
+          } catch (e) {}
+          change(context);
+          context = null;
+        }
+      `
     });
-  };
-})();
+  });
+});
 
-app.timers.setTimeout(build, 3000);
-app.storage.on('rules', build);
+var build = function (name) {
+  console.log('building', name);
+  chrome.contextMenus.removeAll(() => {
+    defaults.utils.getProfile(name, profile => {
+      Object.keys(profile).sort().forEach(title => {
+        chrome.contextMenus.create({
+          id: title,
+          title,
+          contexts: ['editable']
+        });
+      });
+    });
+  });
+};
+
+window.setTimeout(build, 3000);
+chrome.storage.onChanged.addListener(prefs => {
+  if (prefs.current) {
+    build(prefs.current);
+  }
+  if (Object.keys(prefs).filter(n => n.startsWith('profile-')).length) {
+    build();
+  }
+});
 
 // popup
 (function (onCommand) {
   chrome.commands.onCommand.addListener(onCommand);
-  app.popup.receive('fill-forms', onCommand);
+  chrome.runtime.onMessage.addListener(request => {
+    if (request.cmd === 'fill-forms') {
+      onCommand();
+    }
+  });
 })(function () {
-  console.log('called');
-  app.tabs.query({
+  chrome.tabs.query({
     active: true,
     currentWindow: true
-  }, (tabs) => tabs.forEach(tab => app.inject.send(tab.id, 'fill', {
-    types: config.settings.types,
-    profile: config.profiles.users.current
-  })));
-  app.popup.hide();
-});
-
-app.popup.receive('show', () => app.popup.send('show', {
-  list: config.profiles.users.list,
-  current: config.profiles.users.current
-}));
-app.popup.receive('generate-password', function () {
-  function gen(charset, length) {
-    return Array.apply(null, new Array(length))
-      .map(() => charset.charAt(Math.floor(Math.random() * charset.length)))
-      .join('');
-  }
-  app.clipboard.write(gen(config.settings.password.charset, config.settings.password.length));
-  app.notifications.create(null, {
-    type: 'basic',
-    iconUrl: 'data/icons/48.png',
-    title: 'AutoFill Forms',
-    message: 'a new random password is stored in your clipboard'
-  });
-  app.popup.hide();
-});
-app.popup.receive('open-settings', () => {
-  app.tabs.create({
-    url: app.extension.getURL('data/options/index.html')
-  });
-  app.popup.hide();
-});
-app.popup.receive('open-faqs', () => {
-  app.tabs.create({
-    url: 'http://add0n.com/autofillforms-e10s.html'
-  });
-  app.popup.hide();
-});
-app.popup.receive('open-bugs', () => {
-  app.tabs.create({
-    url: 'https://github.com/sarahavilov/autofillforms-e10s'
-  });
-  app.popup.hide();
-});
-app.popup.receive('profile', function (name) {
-  config.profiles.users.current = name;
-  trigger.emit('profile');
-});
-app.popup.receive('extract-rules', function () {
-  let rules = config.profiles.getrules();
-  config.profiles.getExceptions().forEach(n => delete rules[n]);
-
-  app.tabs.query({
-    active: true,
-    currentWindow: true
-  }, (tabs) => tabs.forEach(tab => app.inject.send(tab.id, 'find-rules', {
-    type: config.settings.types,
-    rules
-  })));
-  app.popup.hide();
-});
-app.popup.receive('create-profile', function () {
-  let rules = config.profiles.getrules();
-  config.profiles.getExceptions().forEach(n => delete rules[n]);
-  app.tabs.query({
-    active: true,
-    currentWindow: true
-  }, (tabs) => tabs.forEach(tab => app.inject.send(tab.id, 'to-profile', {
-    types: config.settings.types,
-    rules,
-    profile: config.profiles.users.current
-  })));
-  app.popup.hide();
-});
-// options
-function sendProfile () {
-  app.options.send('profile', {
-    profile: config.profiles.getprofile(),
-    defaults: config.profiles.users.default
-  });
-}
-function sendUsers () {
-  app.options.send('users', {
-    list: config.profiles.users.list,
-    current: config.profiles.users.current
-  });
-}
-function sendRules () {
-  let rules = config.profiles.getrules();
-  app.options.send('rules', {
-    rules: Object.keys(rules).map(name => ({
-      site: rules[name]['site-rule'],
-      field: rules[name]['field-rule'],
-      name
-    })),
-    defaults: config.profiles.rules
-  });
-}
-function sendPassword () {
-  app.options.send('password', config.settings.password);
-}
-function sendTypes () {
-  app.options.send('types', config.settings.types);
-}
-app.options.receive('init', function () {
-  sendPassword();
-  sendTypes();
-  sendProfile();
-  sendUsers();
-  sendRules();
-});
-app.options.receive('password.length', function (num) {
-  config.settings.password.length = +num;
-  sendPassword();
-});
-app.options.receive('password.charset', function (val) {
-  config.settings.password.charset = val;
-  sendPassword();
-});
-app.options.receive('types', function (types) {
-  config.settings.types = types;
-  sendTypes();
-});
-trigger.on('users', function () {
-  sendUsers();
-  sendProfile();
-});
-app.options.receive('add-a-user', (name) => {
-  let list = config.profiles.users.list.concat(name);
-  list = list.filter((n, i, l) => l.indexOf(n) === i);
-  config.profiles.users.list = list;
-  config.profiles.users.current = name;
-  trigger.emit('users');
-});
-app.options.receive('delete-a-user', (name) => {
-  let list = config.profiles.users.list;
-  list = list.filter(n => n !== name);
-  config.profiles.users.list = list;
-  if (config.profiles.users.current === name) {
-    config.profiles.users.current = 'default';
-  }
-  trigger.emit('users');
-});
-app.options.receive('rename-a-user', (obj) => {
-  let list = config.profiles.users.list;
-  let profile = config.profiles.getprofile(obj.oldname);
-  list = list.map(n => n === obj.oldname ? obj.newname : n);
-  config.profiles.setprofile(obj.newname, profile);
-  config.profiles.users.list = list;
-  config.profiles.users.current = obj.newname;
-  trigger.emit('users');
-});
-app.options.receive('duplicate-a-user', (name) => {
-  let list = config.profiles.users.list;
-  let profile = config.profiles.getprofile(name);
-  let index = list.indexOf(name);
-  let newname = 'copy of ' + name;
-  while (list.indexOf(newname) !== -1) {
-    newname = 'copy of ' + newname;
-  }
-  list.splice(index + 1, 0, newname);
-  config.profiles.setprofile(newname, profile);
-  config.profiles.users.list = list;
-  config.profiles.users.current = newname;
-  trigger.emit('users');
-});
-
-trigger.on('update-profile', function () {
-  sendProfile();
-  build();
-});
-trigger.on('add-to-profile', function (obj) {
-  let current = obj.profile || config.profiles.users.current;
-  let profile = config.profiles.getprofile(current);
-  profile[obj.name] = obj.value;
-  let tmp = {};
-  Object.keys(profile).forEach(function (key) {
-    if (profile[key] !== config.profiles.users.default[key]) {
-      tmp[key] = profile[key];
-    }
-  });
-  config.profiles.setprofile(current, tmp);
-});
-app.options.receive('add-to-profile', (obj) => {
-  trigger.emit('add-to-profile', obj);
-  trigger.emit('update-profile');
-});
-trigger.on('delete-a-value', function (obj) {
-  let current = obj.profile || config.profiles.users.current;
-  let profile = config.profiles.getprofile(current);
-  let defaults = Object.keys(config.profiles.users.default);
-  delete profile[obj.name];
-  // deleting a custom rule
-  if (defaults.indexOf(obj.name) !== -1) {
-    config.profiles.addException(current, obj.name);
-  }
-  let tmp = {};
-  Object.keys(profile).forEach(function (key) {
-    if (profile[key] !== config.profiles.users.default[key]) {
-      tmp[key] = profile[key];
-    }
-  });
-  config.profiles.setprofile(current, tmp);
-});
-app.options.receive('delete-a-value', function (name) {
-  trigger.emit('delete-a-value', {name});
-  sendProfile();
-  build();
-});
-app.options.receive('reset-exceptions', function () {
-  config.profiles.clearExceptions(config.profiles.users.current);
-  sendProfile();
-  build();
-});
-trigger.on('profile', function () {
-  sendUsers();
-  sendProfile();
-  build();
-});
-app.options.receive('change-profile', (name) => {
-  config.profiles.users.current = name;
-  trigger.emit('profile');
-});
-
-trigger.on('add-to-rules', function (obj) {
-  let rules = config.profiles.rules;
-  if (rules[obj.name] && rules[obj.name]['site-rule'] === obj.site && rules[obj.name]['field-rule'] === obj.field) {
-    config.profiles.setrule(obj.name, null, true);
-  }
-  else {
-    config.profiles.setrule(obj.name, {
-      'site-rule': obj.site || '(?:)',
-      'field-rule': obj.field
-    });
-  }
-});
-app.options.receive('add-to-rules', function (obj) {
-  trigger.emit('add-to-rules', obj);
-  sendRules();
-});
-app.options.receive('delete-a-rule', function (name) {
-  config.profiles.setrule(name, null, true);
-  sendRules();
-});
-app.options.receive('export-all', function () {
-  let content = {};
-  content.rules = config.profiles.getrules();
-  content.profiles = {};
-  config.profiles.users.list.concat('default').forEach(function (profile) {
-    content.profiles[profile] = {
-      exceptions: config.profiles.getExceptions(profile),
-      profile: config.profiles.getprofile(profile)
-    };
-  });
-  app.options.send('download', {
-    name: 'all',
-    content
-  });
-});
-app.options.receive('export-rules', function () {
-  let content = {};
-  content.rules = config.profiles.getrules();
-  content.profiles = {};
-  app.options.send('download', {
-    name: 'rules',
-    content
-  });
-});
-app.options.receive('export-profiles', function () {
-  let content = {};
-  content.rules = {};
-  content.profiles = {};
-  config.profiles.users.list.concat('default').forEach(function (profile) {
-    content.profiles[profile] = {
-      exceptions: config.profiles.getExceptions(profile),
-      profile: config.profiles.getprofile(profile)
-    };
-  });
-  app.options.send('download', {
-    name: 'profiles',
-    content
-  });
-});
-app.options.receive('export-active', function () {
-  let content = {};
-  content.rules = config.profiles.getrules();
-  let exceptions = config.profiles.getExceptions();
-  exceptions.forEach(n => delete content.rules[n]);
-  content.profiles = {};
-  let profile = config.profiles.users.current;
-  content.profiles[profile] = {
-    exceptions,
-    profile: config.profiles.getprofile(profile)
-  };
-
-  app.options.send('download', {
-    name: 'active-user',
-    content
-  });
-});
-app.options.receive('import', function (content) {
-  if (!content) {
-    return;
-  }
-  content = JSON.parse(content);
-  // update rules
-  let rules = content.rules;
-  Object.keys(rules).forEach(function (name) {
-    trigger.emit('add-to-rules', {
-      name,
-      site: rules[name]['site-rule'],
-      field: rules[name]['field-rule']
-    });
-  });
-  let profiles = content.profiles;
-  // add users
-  config.profiles.users.list = config.profiles.users.list.concat(Object.keys(profiles))
-    .filter((n, i, l) => n && l.indexOf(n) === i && n !== 'default');
-  config.profiles.users.current = 'default';
-  // update profiles
-  Object.keys(profiles).forEach(function (profile) {
-    Object.keys(profiles[profile].profile).forEach(function (name) {
-      trigger.emit('add-to-profile', {
-        profile,
-        name,
-        value: profiles[profile].profile[name]
-      });
-    });
-    profiles[profile].exceptions.forEach(function (name) {
-      trigger.emit('delete-a-value', {
-        name,
-        profile
+  }, (tabs) => {
+    tabs.forEach(tab => {
+      chrome.tabs.executeScript(tab.id, {
+        'runAt': 'document_start',
+        'allFrames': true,
+        'code': `var mode = 'insert'`
+      }, () => {
+        chrome.tabs.executeScript(tab.id, {
+          'runAt': 'document_start',
+          'allFrames': true,
+          'file': '/lib/defaults.js'
+        }, () => {
+          chrome.tabs.executeScript(tab.id, {
+            'runAt': 'document_start',
+            'allFrames': true,
+            'file': '/lib/regtools.js'
+          }, () => {
+            chrome.tabs.executeScript(tab.id, {
+              'runAt': 'document_start',
+              'allFrames': true,
+              'file': '/data/inject/fill.js'
+            });
+          });
+        });
       });
     });
   });
-  sendUsers();
-  sendProfile();
-  sendRules();
-  build();
 });
 
 // inject
-app.inject.receive('guess', function (tabID, obj) {
-  let _rules = config.profiles.getrules();
-  config.profiles.getExceptions().forEach(n => delete _rules[n]);
-
-  let rules = Object.keys(_rules).map(name => ({
-    name,
-    field: function (input) {
-      let exp = _rules[name]['field-rule'];
-      if (exp.startsWith('position:')) {
-        let index = input.index;
-        let formIndex = input.formIndex;
-        return exp === 'position:' + index + '/' + formIndex || exp === 'position:' + index;
-      }
-      else {
-        let r = (new RegExp(exp, 'i'));
-        return r.test(input.name) || r.test(input.textContent);
-      }
-    },
-    site: new RegExp(_rules[name]['site-rule'], 'i')
-  }));
-
-  let inputs = obj.inputs.map(function (input) {
-    for (let n in rules) {
-      if (rules[n].field(input) && rules[n].site.test(obj.href)) {
-        return Object.assign(input, {rule: rules[n].name});
-      }
-    }
-    return null;
-  }).filter(input => input);
-
-  // assigning value
-  let profile = config.profiles.getprofile(obj.profile);
-  inputs.forEach((input, index) => inputs[index].value = profile[input.rule] || input.rule);
-  // use String_random.js if value is a regular expression
-  inputs.forEach((input, index) => inputs[index].value = format(inputs[index].value));
-  app.inject.send(tabID, 'guess', inputs);
-});
-app.inject.receive('generated-rules', function (tabID, rules) {
-  rules.forEach(obj => config.profiles.setrule(obj.name, {
-    'site-rule': obj.site || '(?:)',
-    'field-rule': obj.field
-  }));
-  sendRules();
-  notify(`${rules.length} rules is added or updated in your rule list`);
-});
-app.inject.receive('generated-values', function (tabID, obj) {
-  let users = config.profiles.users.list.concat(obj.name);
-  users = users.filter((n, i, l) => n && l.indexOf(n) === i && n !== 'default');
-  config.profiles.users.list = users;
-  config.profiles.users.current = obj.name;
-  trigger.emit('users');
-
-  let keys = Object.keys(obj.values);
-  keys.forEach(k => {
-    trigger.emit('add-to-profile', {
-      name: k,
-      value: obj.values[k]
-    });
-  });
-  trigger.emit('update-profile');
-  notify(`${keys.length} values is added or updated for "${obj.name}" profile.`);
-});
-app.inject.receive('notify', (tabID, msg) => notify(msg));
-/* startup */
-app.startup(function () {
-  let version = config.welcome.version;
-  let cv = app.version();
-  if (cv !== version) {
-    app.timers.setTimeout(() => {
-      app.tabs.create({
-        url: 'http://add0n.com/autofillforms-e10s.html?v=' + cv +
-        (version ? '&p=' + version + '&type=upgrade' : '&type=install')
+chrome.runtime.onMessage.addListener((request, sender, response) => {
+  // from content script
+  if (request.cmd === 'get-url') {
+    response(sender.tab.url);
+  }
+  else if (request.cmd === 'notify') {
+    defaults.utils.notify(request.message);
+  }
+  // from popup
+  else if (request.cmd === 'extract-rules') {
+    chrome.tabs.query({
+      active: true,
+      currentWindow: true
+    }, (tabs) => {
+      tabs.forEach(tab => {
+        let hostname = (new URL(tab.url)).hostname;
+        // add rules to this hostname only?
+        chrome.tabs.executeScript(tab.id, {
+          'runAt': 'document_start',
+          'allFrames': false,
+          'code': `
+            window.confirm('Only add rules for this domain (${hostname})?');
+          `
+        }, response => {
+          // set global variable
+          chrome.tabs.executeScript(tab.id, {
+            'runAt': 'document_start',
+            'allFrames': true,
+            'code': `
+              var hostname = '${response[0] ? hostname : ''}';
+            `
+          }, () => {
+            // run the actual extractor
+            chrome.tabs.executeScript(tab.id, {
+              'runAt': 'document_start',
+              'allFrames': true,
+              'file': '/lib/defaults.js'
+            }, () => {
+              chrome.tabs.executeScript(tab.id, {
+                'runAt': 'document_start',
+                'allFrames': true,
+                'file': '/data/inject/extract_rules.js'
+              });
+            });
+          });
+        });
       });
-      config.welcome.version = cv;
-    }, config.welcome.timeout);
+    });
+  }
+  else if (request.cmd === 'create-profile') {
+    chrome.tabs.query({
+      active: true,
+      currentWindow: true
+    }, (tabs) => {
+      tabs.forEach(tab => {
+        // ask for profile name
+        chrome.tabs.executeScript(tab.id, {
+          'runAt': 'document_start',
+          'allFrames': false,
+          'code': `
+            window.prompt(
+              'Select a name for your new profile or use an old name to update existing profile',
+              '${request.profile}'
+            );
+          `
+        }, response => {
+          // inject response variable to content script
+          if (response[0]) {
+            chrome.tabs.executeScript(tab.id, {
+              'runAt': 'document_start',
+              'allFrames': true,
+              'code': `
+                var current = '${response[0]}';
+                var mode = 'retrieve';
+              `
+            }, () => {
+              chrome.tabs.executeScript(tab.id, {
+                'runAt': 'document_start',
+                'allFrames': true,
+                'file': '/lib/defaults.js'
+              }, () => {
+                chrome.tabs.executeScript(tab.id, {
+                  'runAt': 'document_start',
+                  'allFrames': true,
+                  'file': '/data/inject/fill.js'
+                });
+              });
+            });
+          }
+        });
+      });
+    });
   }
 });
+
+// FAQs & Feedback
+chrome.storage.local.get({
+  'version': null,
+  'faqs': navigator.userAgent.toLowerCase().indexOf('firefox') === -1 ? true : false
+}, prefs => {
+  let version = chrome.runtime.getManifest().version;
+
+  if (prefs.version ? (prefs.faqs && prefs.version !== version) : true) {
+    chrome.storage.local.set({version}, () => {
+      chrome.tabs.create({
+        url: 'http://add0n.com/autofillforms-e10s.html?version=' + version +
+          '&type=' + (prefs.version ? ('upgrade&p=' + prefs.version) : 'install')
+      });
+    });
+  }
+});
+(function () {
+  let {name, version} = chrome.runtime.getManifest();
+  chrome.runtime.setUninstallURL('http://add0n.com/feedback.html?name=' + name + '&version=' + version);
+})();

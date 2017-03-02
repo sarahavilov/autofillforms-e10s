@@ -13,9 +13,7 @@
     <div id="filling">
       <div>
         <button data-cmd="fill-forms"><b>Fill Forms</b><br>via<br>"<b id="profile">default</b>" Profile</button>
-        <select>
-          <option>1</option>
-        </select>
+        <select></select>
       </div>
       <input type="search" id="search" placeholder="fuzzy-search profiles">
     </div>
@@ -24,8 +22,8 @@
       <input type="button" data-cmd="extract-rules" value="Extract Rules" title="Extract all possible rules from current page">
       <input type="button" data-cmd="create-profile" value="Update Profile" title="Create a new profile or update existing profile from data inserted in the page based on the known rules">
     </div>
-    <script src="chrome/chrome.js"></script>
     <script src="fuse.js"></script>
+    <script src="/lib/defaults.js"></script>
     <script src="index.js"></script>
   </body>
 </html>
