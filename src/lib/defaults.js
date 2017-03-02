@@ -222,8 +222,8 @@ defaults.utils = {
   addUser: (name, users, callback = function () {}) => {
     users = users.split(', ')
       .filter((n, i, l) => n && l.indexOf(n) === i && n !== 'default')
-      .join(', ')
-      .sort();
+      .sort()
+      .join(', ');
     chrome.storage.local.set({
       users
     }, callback);

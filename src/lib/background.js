@@ -26,7 +26,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 var build = function (name) {
-  console.log('building', name);
   chrome.contextMenus.removeAll(() => {
     defaults.utils.getProfile(name, profile => {
       Object.keys(profile).sort().forEach(title => {
