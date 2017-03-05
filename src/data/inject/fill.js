@@ -1,6 +1,25 @@
 /* globals mode, current, defaults */
 'use strict';
 
+function inspect (node) {
+  let results = [];
+
+  function one (node) {
+    results = results.concat([
+      node.value,
+      node.placeholder,
+      node.tagName === 'SELECT' || node.querySelector('select') ? '' : node.textContent
+    ]);
+  }
+  one(node);
+  [...node.parentElement.children].forEach(node => one(node));
+  results = results
+    .map(s => (s || '').trim())
+    .filter((s, i, l) => s && s.length > 3 && l.indexOf(s) === i);
+
+  return results;
+}
+
 chrome.storage.local.get({
   current: 'default',
   rules: '{}',
@@ -68,6 +87,7 @@ chrome.storage.local.get({
               let index = matrix.get(input);
               let formIndex = matrix.get(input.form);
               if (exp === 'position:' + index + '/' + formIndex || exp === 'position:' + index) {
+                console.log('found stage 1/1', exp, input);
                 founds.set(input, rules[i].name);
                 break;
               }
@@ -75,6 +95,7 @@ chrome.storage.local.get({
             else {
               let r = (new RegExp(exp, 'i'));
               if (r.test(input.name)) {
+                console.log('found stage 1/2', exp, input);
                 founds.set(input, rules[i].name);
                 break;
               }
@@ -87,16 +108,31 @@ chrome.storage.local.get({
             let exp = rules[i]['field-rule'];
             if (!exp.startsWith('position:')) {
               let r = (new RegExp(exp, 'i'));
-              let content = input.textContent ||
-                input.parentNode.textContent ||
-                input.parentNode.parentNode.textContent;
-              if (r.test(content)) {
+              let bol = inspect(input).reduce((p, c) => p || r.test(c), false);
+              if (bol) {
+                //console.log('found stage 2', exp, input);
                 founds.set(input, rules[i].name);
                 break;
               }
             }
           }
         });
+        // inputs find rules part 3
+        inputs.filter(input => !founds.has(input)).forEach(input => {
+          for (let i in rules) {
+            let exp = rules[i]['field-rule'];
+            if (!exp.startsWith('position:')) {
+              let r = (new RegExp(exp, 'i'));
+              let bol = inspect(input.parentElement).reduce((p, c) => p || r.test(c), false);
+              if (bol) {
+                //console.log('found stage 2', exp, input);
+                founds.set(input, rules[i].name);
+                break;
+              }
+            }
+          }
+        });
+
         // fill values
         if (mode === 'insert') {
           inputs.filter(input => founds.has(input)).forEach(element => {
