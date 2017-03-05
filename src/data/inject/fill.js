@@ -9,10 +9,12 @@ chrome.storage.local.get({
   prefs.rules = defaults.utils.getRules(prefs.rules);
 
   function change (element) {
-    element.dispatchEvent(new Event('keydown'));
-    element.dispatchEvent(new Event('keyup'));
-    element.dispatchEvent(new Event('keychange'));
-    element.dispatchEvent(new Event('change'));
+    try {
+      ['keydown', 'keyup', 'keychange', 'change', 'input'].forEach(name => {
+        element.dispatchEvent(new Event(name, {bubbles: true}));
+      });
+    }
+    catch (e) {}
   }
 
   let types = new RegExp(defaults.types);

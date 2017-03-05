@@ -8,13 +8,11 @@ body {
   padding: 0;
   box-sizing: border-box;
   background-color: #eee;
+
+  width: 400px;
+  height: 300px;
 }
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  body {
-    width: 400px;
-    height: 300px;
-  }
-}
+
 body,
 button,
 input {
