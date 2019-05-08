@@ -8,7 +8,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     value = defaults.utils.format(value);
 
     chrome.tabs.executeScript(tab.id, {
-      'frameId': info.frameId,
       'runAt': 'document_start',
       'allFrames': true,
       'code': `
