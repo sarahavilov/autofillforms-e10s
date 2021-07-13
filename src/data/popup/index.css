@@ -1,4 +1,5 @@
-body, html {
+body,
+html {
   height: 100%;
 }
 body {
@@ -8,7 +9,6 @@ body {
   padding: 0;
   box-sizing: border-box;
   background-color: #eee;
-
   width: 400px;
   height: 300px;
 }
@@ -22,7 +22,7 @@ input {
 input,
 select,
 button {
-  border: solid 1px #d8d8d8;
+  border: none;
   background-color: #fff;
   outline: none;
 }
@@ -56,8 +56,7 @@ button * {
 
 #toolbar {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+  flex-direction: row-reverse;
 }
 #toolbar input {
   width: 45px;
@@ -66,7 +65,7 @@ button * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 120%;
-  margin: 1px;
+  margin: 0;
   color: #fff;
   border: none;
 }
@@ -90,22 +89,21 @@ button * {
   flex: 1;
   flex-direction: column;
 }
-#filling button,
-#filling select {
-  height: 80px;
-}
 #filling button {
   overflow: hidden;
-  width: 140px;
+  width: 200px;
+  height: 80px;
   line-height: 16px;
 }
 #filling select {
-  width: 16px;
-  text-indent: 30px;
-  border-left: none;
+  margin-left: -32px;
+  width: 32px;
+  height: 32px;
+  text-indent: 32px;
+  align-self: start;
 }
 #filling input {
-  width:  156px;
+  width: 200px;
   height: 30px;
   text-align: center;
   border-top: none;
@@ -118,12 +116,18 @@ button * {
 }
 
 #tools {
-  display: flex;
+  display: grid;
   flex-direction: row;
-  padding: 0 3px 6px 3px;
+  grid-template-columns: repeat(3, 1fr);
 }
-#tools>input {
-  flex: 1;
-  margin: 0 3px;
-  height: 30px;
+#tools > input {
+  padding: 10px;
+}
+#tools > input:not(:last-child) {
+  border-right: solid 1px #d8d8d8;
+}
+
+#search {
+  font-style: italic;
+  background-color: #d8d8d8;
 }

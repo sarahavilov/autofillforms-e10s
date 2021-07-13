@@ -1,40 +1,37 @@
 /* globals Fuse, defaults */
 'use strict';
-var select = document.querySelector('select');
-var profile = document.getElementById('profile');
-var search = document.getElementById('search');
+const select = document.querySelector('select');
+const profile = document.getElementById('profile');
+const search = document.getElementById('search');
 
-var fuse = {
-  search: function () {
+let fuse = {
+  search: function() {
     return [0];
   }
 };
+const notify = e => chrome.notifications.create({
+  type: 'basic',
+  iconUrl: '/data/icons/48.png',
+  title: chrome.runtime.getManifest().name,
+  message: e.message || e
+});
 
-document.addEventListener('click', function (e) {
-  let cmd = e.target.dataset.cmd;
+document.addEventListener('click', function(e) {
+  const cmd = e.target.dataset.cmd;
 
   if (cmd === 'generate-password') {
     chrome.storage.local.get({
       'password.charset': 'qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM1234567890',
       'password.length': 12
     }, prefs => {
-      let length = prefs['password.length'];
-      let password = Array.apply(null, new Array(length))
+      const length = prefs['password.length'];
+      const password = [...new Array(length)]
         .map(() => prefs['password.charset'].charAt(Math.floor(Math.random() * length)))
         .join('');
-      // write to clipboard
-      document.oncopy = function (event) {
-        event.clipboardData.setData('text/plain', password);
-        event.preventDefault();
-      };
-      document.execCommand('Copy', false, null);
-      chrome.notifications.create(null, {
-        type: 'basic',
-        iconUrl: '/data/icons/48.png',
-        title: 'AutoFill Forms',
-        message: 'a new random password is stored in your clipboard'
-      });
-      window.close();
+      navigator.clipboard.writeText(password).then(() => {
+        notify('a new random password is stored in your clipboard');
+        window.close();
+      }).catch(e => notify(e));
     });
   }
   else if (cmd === 'open-settings') {
@@ -42,7 +39,7 @@ document.addEventListener('click', function (e) {
   }
   else if (cmd === 'open-faqs') {
     chrome.tabs.create({
-      url: 'http://add0n.com/autofillforms-e10s.html'
+      url: chrome.runtime.getManifest().homepage_url
     });
     window.close();
   }
@@ -61,10 +58,10 @@ document.addEventListener('click', function (e) {
   }
 });
 // select
-(function (callback) {
+(function(callback) {
   let old = select.value;
-  function check () {
-    let value = select.value;
+  function check() {
+    const value = select.value;
     if (value !== old) {
       old = value;
       callback(value);
@@ -72,7 +69,7 @@ document.addEventListener('click', function (e) {
   }
   select.addEventListener('change', check);
   select.addEventListener('click', check);
-})(function (current) {
+})(function(current) {
   profile.textContent = current;
   chrome.storage.local.set({current});
 });
@@ -81,10 +78,10 @@ chrome.storage.local.get({
   users: '',
   current: 'default'
 }, prefs => {
-  let users = defaults.utils.getUsers(prefs.users);
+  const users = defaults.utils.getUsers(prefs.users);
   fuse = new Fuse(users);
   users.forEach(name => {
-    let option = document.createElement('option');
+    const option = document.createElement('option');
     option.textContent = option.value = name;
     select.appendChild(option);
   });
@@ -93,8 +90,8 @@ chrome.storage.local.get({
 });
 
 search.addEventListener('keypress', () => {
-  let index = fuse.search(search.value)[0] || 0;
-  let current = fuse.list[index];
+  const index = fuse.search(search.value)[0] || 0;
+  const current = fuse.list[index];
   profile.textContent = current;
   chrome.storage.local.set({current});
 });

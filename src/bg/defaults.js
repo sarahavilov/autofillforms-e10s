@@ -184,14 +184,14 @@ defaults.rules = {
 defaults.utils = {
   getProfile: (name, callback) => {
     if (name) {
-      let pname = 'profile-' + name;
-      let ename = 'profile-' + name + '-exceptions';
+      const pname = 'profile-' + name;
+      const ename = 'profile-' + name + '-exceptions';
       chrome.storage.local.get({
         [pname]: '{}',
         [ename]: '[]'
       }, apfs => {
         let profile = JSON.parse(apfs[pname]);
-        let exceptions = JSON.parse(apfs[ename]);
+        const exceptions = JSON.parse(apfs[ename]);
         profile = Object.assign({}, defaults.profile, profile);
         exceptions.forEach(name => delete profile[name]);
 
@@ -204,9 +204,9 @@ defaults.utils = {
       }, prefs => defaults.utils.getProfile(prefs.current, callback));
     }
   },
-  storeProfile: (name, profile, callback = function () {}) => {
-    let names = Object.keys(profile);
-    let prefs = {
+  storeProfile: (name, profile, callback = function() {}) => {
+    const names = Object.keys(profile);
+    const prefs = {
       ['profile-' + name + '-exceptions']: JSON.stringify(
         Object.keys(defaults.profile).filter(name => names.indexOf(name) === -1)
       ),
@@ -219,7 +219,7 @@ defaults.utils = {
     };
     chrome.storage.local.set(prefs, callback);
   },
-  addUser: (name, users, callback = function () {}) => {
+  addUser: (name, users, callback = function() {}) => {
     users = users.split(', ')
       .filter((n, i, l) => n && l.indexOf(n) === i && n !== 'default')
       .sort()
@@ -228,23 +228,22 @@ defaults.utils = {
       users
     }, callback);
   },
-  getUsers: (sUsers) => sUsers.split(', ').concat('default').filter(n => n),
-  getRules: (sRules) => {
-    let rules = JSON.parse(sRules);
+  getUsers: sUsers => sUsers.split(', ').concat('default').filter(n => n),
+  getRules: sRules => {
+    const rules = JSON.parse(sRules);
     return Object.assign({}, defaults.rules, rules);
   },
-  cleanDB: (callback) => {
+  cleanDB: callback => {
     chrome.storage.local.get(null, prefs => {
-      let users = defaults.utils.getUsers(prefs.users || '');
+      const users = defaults.utils.getUsers(prefs.users || '');
 
-      let profiles = Object.keys(prefs)
+      const profiles = Object.keys(prefs)
         .filter(n => n.startsWith('profile-'))
         .map(n => n.replace('profile-', '').replace('-exceptions', ''))
         .filter((n, i, l) => l.indexOf(n) === i)
         .filter(n => users.indexOf(n) === -1)
         .map(name => ['profile-' + name, 'profile-' + name + '-exceptions'])
-          // flatten
-        .reduce((a, b) => a.concat(b), []);
+        .reduce((a, b) => a.concat(b), []); // flatten
       chrome.storage.local.remove(profiles, callback);
     });
   },
@@ -264,11 +263,11 @@ defaults.utils = {
       });
     }
   },
-  clean: (str) => {
-    return str.replace(/([`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/])/gi, '\\$1').replace(/\\{3,}/g, '\\\\');
+  clean: str => {
+    return str.replace(/([`~!@#$%^&*()_|+\-=?;:'",.<>{}[\]\\/])/gi, '\\$1').replace(/\\{3,}/g, '\\\\');
   },
-  format: (value) => {
-    let tmp = /^\/(.+)\/[gimuy]*$/.exec(value);
+  format: value => {
+    const tmp = /^\/(.+)\/[gimuy]*$/.exec(value);
     if (tmp && tmp.length) {
       try {
         value = regtools.gen(tmp[1]);
@@ -277,7 +276,7 @@ defaults.utils = {
         value = e.message || e;
       }
     }
-    value = value.split(/(?:\\n)|(?:<br\>)|(?:<br\/\>)/).join('\n');
+    value = value.split(/(?:\\n)|(?:<br>)|(?:<br\/>)/).join('\n');
     return value;
   }
 };

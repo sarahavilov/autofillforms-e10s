@@ -1,8 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>AutoFill Forms :: Options</title>
+    <meta charset="utf-8">
+    <title>AutoFill Forms :: Options Page</title>
     <link rel="stylesheet" href="index.css">
   </head>
   <body vbox>
@@ -38,6 +37,10 @@
             <td>Export saved settings</td>
             <td><input type="button" value="Export" data-cmd="export"></td>
           </tr>
+          <tr>
+            <td>Cross-origin frames</td>
+            <td><input type="button" value="Access" data-cmd="permission"></td>
+          </tr>
         </table>
       </div>
       <div data-index="2" data-active=true vbox flex=1>
@@ -67,7 +70,7 @@
               <tr>
                 <th>Rule Name</th>
                 <th>Rule Value</th>
-                <th>Remove</th>
+                <th>-</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -97,14 +100,14 @@
               <col width="100"></col>
               <col width="100"></col>
               <col></col>
-              <col width=20></col>
+              <col width="20"></col>
             </colgroup>
             <thead>
               <tr>
                 <th>Rule Name</th>
                 <th>Site Rule</th>
                 <th>Field Rule (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a> or position:index)</th>
-                <th>Remove</th>
+                <th>-</th>
               </tr>
             </thead>
             <tbody id="rules">
@@ -130,11 +133,12 @@
         </div>
       </div>
     </div>
-    <div id="save" hbox pack="end" align="center">
-      <input type="button" value="Save" data-cmd="save">
-      <span id="info"></span>
+    <div id="save">
+      <input type="button" value="Support Development" data-cmd="support">
+      <input type="button" value="Factory Reset" data-cmd="reset"> - <input type="button" value="Save Options" data-cmd="save">
+      <span id="toast"></span>
     </div>
-    <script src="/lib/defaults.js"></script>
+    <script src="/bg/defaults.js"></script>
     <script src="index.js"></script>
   </body>
 </html>

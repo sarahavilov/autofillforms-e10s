@@ -6,33 +6,29 @@ chrome.storage.local.get({
 }, prefs => {
   prefs.rules = defaults.utils.getRules(prefs.rules);
 
-  let types = new RegExp(defaults.types);
+  const types = new RegExp(defaults.types);
   // get all input fields
-  let inputs = [...document.forms].map(form => {
+  const inputs = [...document.forms].map(form => {
     return [...form.querySelectorAll('[name]')]
       .filter(input => input.name && types.test(input.type));
-  })
-  // flatten
-  .reduce((a, b) => a.concat(b));
+  }).flat();
   //
   if (inputs.length) {
     chrome.runtime.sendMessage({
       cmd: 'get-url'
     }, response => {
       // filter inputs that already match with current set of rules
-      let rules = inputs.filter(input => {
-        let count = Object.keys(prefs.rules)
+      const rules = inputs.filter(input => {
+        const count = Object.keys(prefs.rules)
           .filter(name => {
-            let rule = prefs.rules[name];
-            let t1 = (new RegExp(rule['site-rule'], 'i')).test(response);
-            let t2 = (new RegExp(rule['field-rule'], 'i')).test(input.name);
+            const rule = prefs.rules[name];
+            const t1 = (new RegExp(rule['site-rule'], 'i')).test(response);
+            const t2 = (new RegExp(rule['field-rule'], 'i')).test(input.name);
 
             return t1 && t2;
           }).length;
         return count === 0;
-      })
-      // converting to rules
-      .map(input => {
+      }).map(input => { // converting to rules
         return {
           'name': input.name,
           'field': defaults.utils.clean(input.name),
@@ -40,13 +36,13 @@ chrome.storage.local.get({
         };
       });
       if (rules.length) {
-        window.top.postMessage({
+        chrome.runtime.sendMessage({
           cmd: 'save-rules',
           rules: {
             new: rules,
             old: prefs.rules
           }
-        }, '*');
+        });
       }
       if (!rules.length && window === window.top) {
         defaults.utils.notify('Cannot find any new rules for this page');
@@ -54,6 +50,6 @@ chrome.storage.local.get({
     });
   }
   else if (window === window.top) {
-    defaults.utils.notify('There is no input at top frame of this page');
+    defaults.utils.notify('There is no input to record on the top frame of the current page!');
   }
 });

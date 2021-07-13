@@ -1,28 +1,48 @@
-html {
-  height: 100%;
-}
 body {
-  height: 100%;
   box-sizing: border-box;
-  padding: 10px;
-  margin: 0;
-  font-family: "Helvetica Neue",Helvetica,sans-serif;
+  margin: 5px 0 0 0;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   font-size: 13px;
-
   min-width: 600px;
   min-height: 500px;
+  background-color: #fff;
+  color: #4d5156;
+  height: calc(100vh - 5px);
+}
+button,
+input[type=submit],
+input[type=button] {
+  height: 24px;
+  color: #444;
+  background-image: linear-gradient(rgb(237, 237, 237), rgb(237, 237, 237) 38%, rgb(222, 222, 222));
+  box-shadow: rgba(0, 0, 0, 0.08) 0 1px 0, rgba(255, 255, 255, 0.75) 0 1px 2px inset;
+  text-shadow: rgb(240, 240, 240) 0 1px 0;
+}
+button,
+textarea,
+input[type=submit],
+input[type=button] {
+  border: solid 1px rgba(0, 0, 0, 0.25);
+}
+input[type=button]:disabled {
+  opacity: 0.5;
+}
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+  padding: 5px;
 }
 table {
   width: 100%;
 }
 input[type=button] {
-  border: solid 1px #ccc;
-  background-color: #fff;
   cursor: pointer;
 }
 input[type=text] {
   text-indent: 5px;
 }
+select,
 input[type=text],
 input[type=button] {
   height: 26px;
@@ -35,7 +55,7 @@ code {
 #tabs {
   z-index: 10;
 }
-#tabs>span {
+#tabs > span {
   display: inline-block;
   border: solid 1px #ccc;
   padding: 2px 5px;
@@ -47,21 +67,21 @@ code {
   text-align: center;
   cursor: pointer;
 }
-#tabs>span[data-active=true] {
+#tabs > span[data-active=true] {
   background-color: #fff;
   border-bottom: solid 1px #fff;
 }
 #panels {
   border: solid 1px #ccc;
 }
-#panels>div {
+#panels > div {
   padding: 10px;
 }
-#panels>div:not([data-active=true]) {
+#panels > div:not([data-active=true]) {
   display: none;
 }
 #save {
-  padding: 5px 0;
+  padding: 10px;
 }
 input[readonly],
 #profile td:first-child {
@@ -89,7 +109,7 @@ input[readonly],
 [align=center] {
   align-items: center;
 }
-[space="2"]>* {
+[space="2"] > * {
   margin: 2px;
 }
 
@@ -99,7 +119,14 @@ input[readonly],
 }
 .editable input[type=text] {
   border-color: transparent;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
 }
-.editable input[type=text]:not([readonly]):active {
-  border-color: blue;
+.editable input[type=text]:not([readonly]):focus {
+  background-color: #ddecff;
+}
+
+input[type=button][data-cmd="delete-row"] {
+  padding: 0 10px;
 }
