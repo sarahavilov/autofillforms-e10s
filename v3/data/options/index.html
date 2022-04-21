@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <title>AutoFill Forms :: Options Page</title>
+    <link rel="stylesheet" href="index.css">
+  </head>
+  <body vbox>
+    <div id="tabs">
+      <span data-index="1">General Settings</span>
+      <span data-index="2" data-active=true>Profiles</span>
+      <span data-index="3">Rules</span>
+    </div>
+    <div id="panels" flex=1 vbox>
+      <div data-index="1">
+        <table>
+          <colgroup>
+            <col width="200">
+            <col>
+          </colgroup>
+          <tr>
+            <td>Acceptable input types (<a target="_blank" href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a>)</td>
+            <td hbox><input type="text" id="types" flex=1></td>
+          </tr>
+          <tr>
+            <td>Password generation charset</td>
+            <td hbox><input type="text" id="password.charset" flex=1></td>
+          </tr>
+          <tr>
+            <td>Password generation length</td>
+            <td hbox><input type="text" id="password.length" flex=1></td>
+          </tr>
+          <tr>
+            <td>Import settings (this will <b>overwrites</b> the current settings)</td>
+            <td>
+              <input type="file" value="Import" data-cmd="import">
+            </td>
+          </tr>
+          <tr>
+            <td>Export saved settings</td>
+            <td><input type="button" value="Export" data-cmd="export"></td>
+          </tr>
+          <tr>
+            <td>Cross-origin frames</td>
+            <td><input type="button" value="Access" data-cmd="permission"></td>
+          </tr>
+          <tr>
+            <td>Element detection mode</td>
+            <td><select id="detect">
+              <option value="body">Any Editable Element</option>
+              <option value="forms">Form Elements</option>
+            </select></td>
+          </tr>
+        </table>
+      </div>
+      <div data-index="2" data-active=true vbox flex=1>
+        <div hbox align=center space=2 style="padding-bottom: 5px;">
+          Profile
+          <select id="users" flex=1></select>
+          <input type="button" value="Duplicate" data-cmd="duplicate">
+          <input type="button" value="Delete" data-cmd="delete" disabled="true">
+          <input type="button" value="Rename" data-cmd="rename" disabled="true">
+          <input type="text" placeholder="new name" id="rename">
+        </div>
+        <div flex=1 style="overflow: auto;" hbox id="profile">
+          <template>
+            <tr>
+              <td><input type="text" value="" placeholder="mandatory"></td>
+              <td><input type="text" value="" placeholder="mandatory"></td>
+              <td><input type="button" value="x" data-cmd="delete-row"></td>
+            </tr>
+          </template>
+          <table class=editable flex=1>
+            <colgroup>
+              <col width="100"></col>
+              <col></col>
+              <col width=20></col>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Rule Name</th>
+                <th>Rule Value</th>
+                <th>-</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div hbox pack=end style="padding: 5px 0;">
+          <input type="button" value="Add a new Value" data-cmd="add-a-value">
+        </div>
+        <div class="notes">
+          <ul>
+            <li>To have a multi-line value, insert <code>\n</code> code between lines</li>
+            <li>Reserved words:
+              <ul>
+                <li><code>_url_</code>: will be replaced by the page url</li>
+                <li><code>_host_</code>: will be replaced by frame/page host name</li>
+              </ul>
+            </li>
+            <li>To generate a random string from a RegExp, surround the expression with <code>/</code> char<br>e.g. to generate a random string of length 5 to 8 use <code>/\w{5,8}/</code>. <a href="https://github.com/cho45/String_random.js" target="_blank">Learn more</a> how to use this feature.
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div data-index="3" vbox flex=1>
+        <div flex=1 style="overflow: auto;" hbox>
+          <table class=editable flex=1>
+            <colgroup>
+              <col width="100"></col>
+              <col width="100"></col>
+              <col></col>
+              <col width="20"></col>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Rule Name</th>
+                <th>Site Rule</th>
+                <th>Field Rule (<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/RegExp" target="_blank">RegExp</a> or position:index)</th>
+                <th>-</th>
+              </tr>
+            </thead>
+            <tbody id="rules">
+              <template>
+                <tr>
+                  <td><input type="text" value="" placeholder="mandatory"></td>
+                  <td><input type="text" value="" placeholder="(?:)"></td>
+                  <td><input type="text" value="" placeholder="mandatory"></td>
+                  <td><input type="button" value="x" data-cmd="delete-row"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <div hbox pack=end style="padding: 5px 0;">
+          <input type="button" value="Add a new Rule" data-cmd="add-a-rule">
+        </div>
+        <div class="notes">
+          <ul>
+             <li>Default rules cannot be deleted. Removing resets to the default value</li>
+             <li><b>Field Rule</b> can be either a regular expression matching the name of the element or can be based on element's position. For instance <code>position:0/1</code> matches to the first element of the second form and <code>position:0</code> matches the first element of all forms in the page.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div id="save">
+      <input type="button" value="Support Development" data-cmd="support">
+      <input type="button" value="Factory Reset" data-cmd="reset"> - <input type="button" value="Save Options" data-cmd="save">
+      <span id="toast"></span>
+    </div>
+    <script src="/bg/defaults.js"></script>
+    <script src="/bg/utils.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

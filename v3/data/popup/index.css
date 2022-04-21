@@ -1,0 +1,153 @@
+:root {
+  --bg: #f8f8f8;
+  --bg-dark: #d8d8d8;
+  --fg: #000;
+  --bg-bug: #edb700;
+  --bg-settings: #3c81e7;
+  --bg-info: #29a24c;
+  --fg-toolbar: #fff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-dark: #202124;
+    --bg: #292a2d;
+    --fg: #ccd0d3;
+    --bg-bug: #5d4800;
+    --bg-settings: #2a5fac;
+    --bg-info: #1f7d3a;
+    --fg-toolbar: #ccd0d3;
+  }
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  width: 430px;
+  background-color: var(--bg);
+}
+
+body,
+button,
+input {
+  color: var(--fg);
+  font-size: 13px;
+}
+
+input,
+select,
+button {
+  border: none;
+  outline: none;
+}
+input[type=button],
+select,
+button {
+  cursor: pointer;
+  background-color: transparent;
+}
+button:active,
+input[type=button]:active {
+  opacity: 0.7;
+}
+
+select {
+  background: transparent;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url(arrow.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  border-radius: 0;
+}
+select:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
+button * {
+  pointer-events: none;
+}
+
+#toolbar {
+  display: flex;
+  flex-direction: row-reverse;
+}
+#toolbar input {
+  width: 64px;
+  height: 24px;
+  font-family: fontello;
+  font-size: 120%;
+  margin: 0;
+  color: var(--fg-toolbar);
+  border: none;
+}
+#toolbar input:nth-child(3) {
+  background-color: var(--bg-bug);
+}
+#toolbar input:nth-child(2) {
+  background-color: var(--bg-info);
+}
+#toolbar input:nth-child(1) {
+  background-color: var(--bg-settings);
+}
+
+#filling,
+#filling div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#filling {
+  flex: 1;
+  flex-direction: column;
+  margin: 0;
+}
+#filling button {
+  overflow: hidden;
+  width: 100vw;
+  height: 100px;
+  line-height: 20px;
+}
+#filling select {
+  margin-left: -32px;
+  width: 32px;
+  height: 32px;
+  text-indent: 32px;
+  align-self: start;
+}
+#filling input {
+  width: 100vw;
+  height: 34px;
+  text-align: center;
+  border-top: none;
+  -webkit-appearance: none;
+  font-style: italic;
+  background-color: var(--bg-dark);
+}
+#filling b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#tools {
+  display: grid;
+  flex-direction: row;
+  grid-template-columns: repeat(3, 1fr);
+}
+#tools > button {
+  padding: 10px;
+  font-size: 12px;
+  position: relative;
+}
+#tools > button:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  width: 1px;
+  height: 14px;
+  background-color: var(--bg-dark);
+}

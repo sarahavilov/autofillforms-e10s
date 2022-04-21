@@ -1,27 +1,24 @@
 {
   "name": "AutoFill Forms",
-  "description": "One click form filler that supports multiple profiles",
-  "version": "0.3.3",
-  "manifest_version": 2,
+  "description": "__MSG_description__",
+  "default_locale": "en",
+  "version": "0.4.0",
+  "manifest_version": 3,
   "permissions": [
+    "scripting",
     "storage",
     "activeTab",
     "notifications",
     "contextMenus"
   ],
-  "optional_permissions": [
+  "optional_host_permissions": [
     "*://*/*"
   ],
-  "browser_action": {
+  "action": {
     "default_popup": "data/popup/index.html"
   },
   "background": {
-    "persistent": false,
-    "scripts": [
-      "bg/regtools.js",
-      "bg/defaults.js",
-      "bg/background.js"
-    ]
+    "service_worker": "bg/worker.js"
   },
   "homepage_url": "https://add0n.com/autofillforms-e10s.html",
   "icons": {
@@ -34,6 +31,7 @@
     "512": "data/icons/512.png"
   },
   "commands": {
+    "_execute_action": {},
     "activate": {
       "suggested_key": {
         "default": "Ctrl+Shift+U"
