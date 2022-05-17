@@ -11,7 +11,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     chrome.tabs.executeScript(tab.id, {
       'frameId': info.frameId,
       'runAt': 'document_start',
-      'allFrames': true,
       'code': `{
         const e = document.activeElement;
         if ('value' in e) {

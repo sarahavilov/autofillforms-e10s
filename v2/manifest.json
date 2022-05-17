@@ -1,7 +1,7 @@
 {
   "name": "AutoFill Forms",
   "description": "One-click form filler that supports multiple profiles and regular expression rules",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "manifest_version": 2,
   "permissions": [
     "storage",
