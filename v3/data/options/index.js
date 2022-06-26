@@ -84,7 +84,6 @@ function save() {
     utils.cleanDB(() => {
       notify('Settings saved', 750, () => {
         // window.location.reload();
-        console.log(prefs);
       });
     });
   });
@@ -325,7 +324,6 @@ document.getElementById('users').addEventListener('change', e => {
   const current = e.target.value;
   const old = e.target.dataset.value;
 
-  console.log(current, old);
   disabled(current);
 
   // updating the old tree

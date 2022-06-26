@@ -119,7 +119,7 @@
         inputs.add(e);
       }
     }
-    for (const e of target.querySelectorAll('input')) {
+    for (const e of target.querySelectorAll('input, textarea')) {
       if (utils.id(e) && types.test(e.type)) {
         inputs.add(e);
       }

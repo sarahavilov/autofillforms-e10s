@@ -29,17 +29,38 @@ chrome.storage.local.get({
       // filter inputs that already match with current set of rules
       const rules = [];
       for (const input of inputs) {
-        const count = Object.keys(prefs.rules).filter(name => {
-          const rule = prefs.rules[name];
+        const name = utils.id(input);
+
+        const matches = Object.values(prefs.rules).map(rule => {
           const t1 = (new RegExp(rule['site-rule'], 'i')).test(response);
-          const t2 = (new RegExp(rule['field-rule'], 'i')).test(input.name || input.id);
+          if (t1) {
+            const r = new RegExp(rule['field-rule'], 'i');
+            const t2 = r.test(name);
+            if (t2) {
+              // does this rule match another element on this page
+              const count = [...inputs].filter(e => r.test(utils.id(e))).length;
 
-          return t1 && t2;
-        }).length;
-        if (count === 0) {
+              if (count === 1) {
+                return true;
+              }
+              else {
+                if (utils.clean(name) === rule['field-rule']) {
+                  return true;
+                }
+                else {
+                  return {name, r, count};
+                }
+              }
+            }
+          }
+          else {
+            return false;
+          }
+        }).filter(a => a);
+
+        // add a new rule if there is no match or there is no exact match
+        if (matches.length === 0 || matches.some(a => a === true) === false) {
           // converting to rules
-          const name = utils.id(input);
-
           rules.push({
             'name': name,
             'field': utils.clean(name),

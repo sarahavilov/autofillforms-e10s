@@ -1,7 +1,7 @@
 self.defaults = {
   'password.charset': 'qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM1234567890',
   'password.length': 12,
-  'types': '^(?:(?:text(?:area)?)|(?:select-(?:(?:one)|(?:multiple)))|(?:checkbox)|(?:radio)|(?:email)|(?:url)|(?:number)|(?:month)|(?:week)|(?:tel)|(?:file))$'
+  'types': '^(?:(?:text(?:area)?)|(?:select-(?:(?:one)|(?:multiple)))|(?:checkbox)|(?:radio)|(?:email)|(?:url)|(?:number)|(?:month)|(?:week)|(?:tel)|(?:file)|(?:textarea))$'
 };
 
 self.defaults.detect = 'body'; // body or forms
@@ -72,17 +72,16 @@ self.defaults.rules = {
   },
 
   'full-name': {
-    'field-rule': 'name',
+    'field-rule': '(?:fullname)|(?:full-name)|(?:name)',
     'site-rule': '(?:)'
   },
-
 
   'state': {
     'field-rule': '(?:state)|(?:prov)|(?:region)',
     'site-rule': '(?:)'
   },
   'zip-code': {
-    'field-rule': '(?:zip)|(?:post[\\w\\s]*code)',
+    'field-rule': '(?:zip[-_])|(?:[-_]zip)|(?:zip)|(?:post[\\w\\s]*code)',
     'site-rule': '(?:)'
   },
 
@@ -127,7 +126,7 @@ self.defaults.rules = {
     'site-rule': '(?:)'
   },
   'middle-name': {
-    'field-rule': '(?:middle[\\w\\s]*name)|(?:name[\\w\\s]*middle)',
+    'field-rule': '(?:middle[\\w\\s]*name)|(?:name[\\w\\s]*middle)|(?:middle[\\w\\s]*i)',
     'site-rule': '(?:)'
   },
   'last-name': {

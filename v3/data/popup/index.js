@@ -58,7 +58,6 @@ chrome.storage.local.get({
   current: 'default'
 }, prefs => {
   const users = utils.getUsers(prefs.users);
-  console.log(users, prefs);
 
   fuse = new Fuse(users);
   users.forEach(name => {

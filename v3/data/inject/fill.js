@@ -1,9 +1,18 @@
-/* globals mode, current, utils, defaults */
+/* global mode, current, utils, defaults */
 'use strict';
 
-function change(element) {
+function change(element, value = ' ') {
   try {
-    ['keydown', 'keyup', 'keychange', 'change', 'input'].forEach(name => {
+    const o = {
+      code: value === ' ' ? 'Space' : value.toUpperCase(),
+      key: value,
+      keyCode: value.charCodeAt(0),
+      which: value.charCodeAt(0)
+    };
+
+    element.dispatchEvent(new KeyboardEvent('keydown', o));
+    element.dispatchEvent(new KeyboardEvent('keyup', o));
+    ['change', 'input'].forEach(name => {
       element.dispatchEvent(new Event(name, {bubbles: true}));
     });
   }
@@ -84,6 +93,44 @@ chrome.storage.local.get({
     });
   }
 
+  // append a new rule name to findings
+  const append = (input, name, regexp, certainty = 1) => {
+    const a = founds.get(input);
+    if (a) {
+      a.push({
+        name,
+        regexp,
+        certainty
+      });
+    }
+    else {
+      founds.set(input, [{
+        name,
+        regexp,
+        certainty
+      }]);
+    }
+  };
+  // decide the best matching name for a finding
+  const decide = input => {
+    const a = founds.get(input);
+    const max = Math.max(...a.map(o => o.certainty));
+    const b = a.filter(o => o.certainty === max);
+
+    const name = utils.id(input);
+
+    b.sort((m, n) => {
+      try {
+        return n.regexp.exec(name)[0].length - m.regexp.exec(name)[0].length;
+      }
+      catch (e) {
+        return 0;
+      }
+    });
+
+    return b[0].name;
+  };
+
   if (inputs.length) {
     chrome.runtime.sendMessage({
       cmd: 'get-url'
@@ -105,23 +152,22 @@ chrome.storage.local.get({
               const formIndex = matrix.get(input.form);
               if (exp === 'position:' + index + '/' + formIndex || exp === 'position:' + index) {
                 console.info('found stage 1/1', exp, input);
-                founds.set(input, rule.name);
-                break;
+                append(input, rule.name, /./, 1);
               }
             }
             else {
               const r = (new RegExp(exp, 'i'));
               const name = utils.id(input);
+              // what if we have multiple matches
               if (r.test(name)) {
                 console.info('found stage 1/2', exp, input);
-                founds.set(input, rule.name);
-                break;
+                append(input, rule.name, r, 0.5);
               }
             }
           }
         });
         // inputs find rules part 2
-        inputs.filter(input => !founds.has(input)).forEach(input => {
+        inputs.forEach(input => {
           for (const rule of rules) {
             const exp = rule['field-rule'];
             if (!exp.startsWith('position:')) {
@@ -129,14 +175,13 @@ chrome.storage.local.get({
               const bol = inspect(input).reduce((p, c) => p || r.test(c), false);
               if (bol) {
                 console.info('found stage 2', exp, input);
-                founds.set(input, rule.name);
-                break;
+                append(input, rule.name, r, 0.25);
               }
             }
           }
         });
         // inputs find rules part 3
-        inputs.filter(input => !founds.has(input)).forEach(input => {
+        inputs.forEach(input => {
           for (const rule of rules) {
             const exp = rule['field-rule'];
             if (!exp.startsWith('position:')) {
@@ -144,8 +189,7 @@ chrome.storage.local.get({
               const bol = inspect(input.parentElement).reduce((p, c) => p || r.test(c), false);
               if (bol) {
                 console.info('found stage 2', exp, input);
-                founds.set(input, rule.name);
-                break;
+                append(input, rule.name, r, 0.15);
               }
             }
           }
@@ -154,7 +198,7 @@ chrome.storage.local.get({
         // fill values
         if (mode === 'insert') {
           inputs.filter(input => founds.has(input)).forEach(element => {
-            let value = profile[founds.get(element)] || '';
+            let value = profile[decide(element)] || '';
 
             if (element.type === 'radio') {
               if (
@@ -175,7 +219,7 @@ chrome.storage.local.get({
               // else {
               //   element.checked = false;
               // }
-              change(element);
+              change(element, ' ');
             }
             else if (element.type === 'select-one' || element.type === 'select-multiple') {
               Array.from(element.options).forEach((option, index) => {
@@ -184,7 +228,7 @@ chrome.storage.local.get({
                   option.textContent.toLowerCase() === value.toLowerCase()
                 ) {
                   element.selectedIndex = index;
-                  change(element);
+                  change(element, ' ');
                 }
               });
             }
@@ -202,14 +246,14 @@ chrome.storage.local.get({
                 element.selectionStart = element.selectionEnd = value.length;
               }
               catch (e) {}
-              change(element);
+              change(element, value.slice(-1));
             }
           });
         }
         else {
           const values = inputs.filter(input => founds.has(input)).map(input => {
             return {
-              name: founds.get(input),
+              name: decide(input),
               value: (input.type === 'checkbox' || input.type === 'radio') ? (input.checked ? input.value : '') : input.value
             };
           }).filter(obj => defaults[obj.name] !== obj.value && profile[obj.name] !== obj.value);

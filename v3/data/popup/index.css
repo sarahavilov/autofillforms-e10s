@@ -7,6 +7,7 @@
   --bg-info: #29a24c;
   --fg-toolbar: #fff;
 }
+
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-dark: #202124;
@@ -73,25 +74,35 @@ button * {
 
 #toolbar {
   display: flex;
-  flex-direction: row-reverse;
 }
 #toolbar input {
   width: 64px;
   height: 24px;
-  font-family: fontello;
   font-size: 120%;
   margin: 0;
   color: var(--fg-toolbar);
   border: none;
 }
-#toolbar input:nth-child(3) {
+#toolbar input[data-cmd="open-bugs"] {
+  font-family: fontello;
   background-color: var(--bg-bug);
 }
-#toolbar input:nth-child(2) {
+#toolbar input[data-cmd="open-faqs"] {
+  font-family: fontello;
   background-color: var(--bg-info);
 }
-#toolbar input:nth-child(1) {
+#toolbar input[data-cmd="open-settings"] {
+  font-family: fontello;
   background-color: var(--bg-settings);
+}
+
+#toolbar input#rate {
+  font-size: 12px;
+  color: #424242;
+  background-color: #ffa400;
+}
+#toolbar input#rate[data-hide=true] {
+  display: none;
 }
 
 #filling,
