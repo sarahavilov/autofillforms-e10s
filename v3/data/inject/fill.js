@@ -49,11 +49,12 @@ chrome.storage.local.get({
   current: 'default',
   rules: '{}',
   users: '',
-  detect: defaults.detect // 'forms', 'body'
+  detect: defaults.detect, // 'forms', 'body'
+  types: defaults.types
 }, prefs => {
   prefs.rules = utils.getRules(prefs.rules);
 
-  const types = new RegExp(defaults.types);
+  const types = new RegExp(prefs.types);
   let inputs = [];
   const matrix = new WeakMap();
   const founds = new WeakMap();

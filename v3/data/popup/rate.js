@@ -16,7 +16,7 @@ document.getElementById('rate').onclick = () => {
     url = 'https://microsoftedge.microsoft.com/addons/detail/cmkofbbahnngfeahbolgimndajfmilmh';
   }
   else if (/Firefox/.test(navigator.userAgent)) {
-    url = 'https://addons.mozilla.org/firefox/addon/autofill-forms-e10s//reviews/';
+    url = 'https://addons.mozilla.org/firefox/addon/autofill-forms-e10s/reviews/';
   }
   else if (/OPR/.test(navigator.userAgent)) {
     url = 'https://addons.opera.com/extensions/details/autofill-forms/';

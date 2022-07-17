@@ -303,3 +303,6 @@ self.regtools.gen = function(pattern) {
   tree = processSelect(tree);
   return processOthers(tree);
 };
+
+// eslint-disable-next-line semi
+'' // Firefox cloning issue

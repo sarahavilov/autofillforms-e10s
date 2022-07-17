@@ -73,6 +73,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
           });
         }
         catch (e) {
+          console.warn(e);
           utils.notify(e.message);
         }
       });

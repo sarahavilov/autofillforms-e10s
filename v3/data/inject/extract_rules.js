@@ -3,11 +3,12 @@
 
 chrome.storage.local.get({
   rules: '{}',
-  detect: 'body'
+  detect: 'body',
+  types: defaults.types
 }, prefs => {
   prefs.rules = utils.getRules(prefs.rules);
 
-  const types = new RegExp(defaults.types);
+  const types = new RegExp(prefs.types);
   // get all input fields
   const inputs = new Set();
 

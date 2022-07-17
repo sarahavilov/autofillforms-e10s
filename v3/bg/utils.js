@@ -126,3 +126,5 @@
     }
   };
 }
+// eslint-disable-next-line semi
+'' // Firefox cloning issue
