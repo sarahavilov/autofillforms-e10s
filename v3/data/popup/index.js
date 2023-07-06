@@ -7,7 +7,7 @@ const search = document.getElementById('search');
 
 let fuse = {
   search: function() {
-    return [0];
+    return [];
   }
 };
 const notify = (e, c = () => {}) => chrome.notifications.create({
@@ -59,7 +59,8 @@ chrome.storage.local.get({
 }, prefs => {
   const users = utils.getUsers(prefs.users);
 
-  fuse = new Fuse(users);
+  fuse = new Fuse(users, {
+  });
   users.forEach(name => {
     const option = document.createElement('option');
     option.textContent = option.value = name;
@@ -69,9 +70,10 @@ chrome.storage.local.get({
   profile.textContent = prefs.current;
 });
 
-search.addEventListener('keypress', () => {
-  const index = fuse.search(search.value)[0] || 0;
-  const current = fuse.list[index];
+search.addEventListener('input', () => {
+  const query = search.value;
+  const o = fuse.search(query)[0];
+  const current = o?.item || fuse.getIndex().docs[0];
   profile.textContent = current;
   chrome.storage.local.set({current});
 });

@@ -96,7 +96,6 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
             args: [request.profile]
           });
           const profile = response.result;
-          console.log(profile, response);
           if (profile) {
             const target = {
               tabId: tab.id,

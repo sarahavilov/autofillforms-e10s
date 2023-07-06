@@ -1,39 +1,39 @@
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="fontello.css"/>
-    <link rel="stylesheet" href="index.css"/>
-  </head>
-  <body>
-    <div id="toolbar">
-      <input type="button" id="rate" value="Rate Me" title="Rate Me" data-hide=true>
-      <span style="flex: 1"></span>
-      <input type="button" data-cmd="open-settings" value="&#xe800;" title="Open settings page">
-      <input type="button" data-cmd="open-faqs" value="&#xe801;" title="Open FAQs page">
-      <input type="button" data-cmd="open-bugs" value="&#xe802;" title="Open bug reporter">
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="fontello.css"/>
+  <link rel="stylesheet" href="index.css"/>
+</head>
+<body>
+  <div id="toolbar">
+    <input type="button" id="rate" value="Rate Me" title="Rate Me" data-hide=true>
+    <span style="flex: 1"></span>
+    <input type="button" data-cmd="open-settings" value="&#xe800;" title="Open settings page">
+    <input type="button" data-cmd="open-faqs" value="&#xe801;" title="Open FAQs page">
+    <input type="button" data-cmd="open-bugs" value="&#xe802;" title="Open bug reporter">
+  </div>
+  <form id="filling">
+    <div>
+      <button><b>Fill Forms</b><br>via<br>"<b id="profile">default</b>" Profile</button>
+      <select></select>
     </div>
-    <form id="filling">
-      <div>
-        <button><b>Fill Forms</b><br>via<br>"<b id="profile">default</b>" Profile</button>
-        <select></select>
-      </div>
-      <input type="search" id="search" placeholder="Find a Profile. Press Enter to Fill" autofocus>
-    </form>
-    <div id="tools">
-      <button id="generate-password" title="Generate a random password (Ctrl + G or Command + G)">
-        <u>G</u>enerate a Password
-      </button>
-      <button id="extract-rules" title="Extract all possible rules from current page (Ctrl + E or Command + E)">
-        <u>E</u>xtract Rules
-      </button>
-      <button id="create-profile" title="Create a new profile or update existing profile from data inserted in the page based on the known rules (Ctrl + U or Command + U)">
-        <u>U</u>pdate Profile
-      </button>
-    </div>
-    <script src="fuse.js"></script>
-    <script src="/bg/defaults.js"></script>
-    <script src="/bg/utils.js"></script>
-    <script src="index.js"></script>
-    <script src="rate.js"></script>
-  </body>
+    <input type="search" id="search" placeholder="Find a Profile. Press Enter to Fill" autofocus>
+  </form>
+  <div id="tools">
+    <button id="generate-password" title="Generate a random password (Ctrl + G or Command + G)">
+      <u>G</u>enerate a Password
+    </button>
+    <button id="extract-rules" title="Extract all possible rules from current page (Ctrl + E or Command + E)">
+      <u>E</u>xtract Rules
+    </button>
+    <button id="create-profile" title="Create a new profile or update existing profile from data inserted in the page based on the known rules (Ctrl + U or Command + U)">
+      <u>U</u>pdate Profile
+    </button>
+  </div>
+  <script src="external/fuse.js"></script>
+  <script src="/bg/defaults.js"></script>
+  <script src="/bg/utils.js"></script>
+  <script src="index.js"></script>
+  <script src="rate.js"></script>
+</body>
 </html>

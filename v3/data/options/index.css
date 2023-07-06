@@ -24,9 +24,6 @@ input[type=submit],
 input[type=button] {
   border: solid 1px rgba(0, 0, 0, 0.25);
 }
-input[type=button]:disabled {
-  opacity: 0.5;
-}
 textarea {
   width: 100%;
   box-sizing: border-box;
@@ -36,18 +33,21 @@ textarea {
 table {
   width: 100%;
 }
-input[type=button] {
-  cursor: pointer;
-}
-input[type=text] {
-  text-indent: 5px;
-}
 select,
 input[type=text],
 input[type=button] {
   height: 26px;
   box-sizing: border-box;
   border: solid 1px rgba(0, 0, 0, 0.25);
+}
+input[type=text] {
+  text-indent: 5px;
+}
+input[type=button] {
+  cursor: pointer;
+}
+input[type=button]:disabled {
+  opacity: 0.5;
 }
 code {
   padding: 0 3px;
@@ -89,6 +89,27 @@ input[readonly],
   color: #888;
   cursor: default;
 }
+a,
+a:visited {
+  color: #07c;
+  text-decoration: none;
+}
+.notes {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.editable input[type=text] {
+  border-color: transparent;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+}
+.editable input[type=text]:not([readonly]):focus {
+  background-color: #ddecff;
+}
+
+input[type=button][data-cmd="delete-row"] {
+  padding: 0 10px;
+}
 
 [hbox] {
   display: flex;
@@ -112,22 +133,4 @@ input[readonly],
 }
 [space="2"] > * {
   margin: 2px;
-}
-
-.notes {
-  background-color: rgba(0, 0, 0, 0.1);
-  font-size: 80%;
-}
-.editable input[type=text] {
-  border-color: transparent;
-  width: 100%;
-  box-sizing: border-box;
-  outline: none;
-}
-.editable input[type=text]:not([readonly]):focus {
-  background-color: #ddecff;
-}
-
-input[type=button][data-cmd="delete-row"] {
-  padding: 0 10px;
 }
