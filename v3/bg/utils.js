@@ -111,6 +111,21 @@
 
 
   utils.id = e => {
+    // if multiple inputs have the same name but different ids, use id for the reset
+    try {
+      const name = e.name;
+      if (name) {
+        const m = (e.closest('form') || document.body).querySelector(`[name="${name}"]`);
+        if (m && m !== e) {
+          const altID = e.id || e.placeholder.replace(/\s/g, '_');
+          if (altID) {
+            return altID;
+          }
+        }
+      }
+    }
+    catch (e) {}
+
     return e.name || e.id || e.placeholder.replace(/\s/g, '_');
   };
   utils.inputs = (target, inputs, types) => {

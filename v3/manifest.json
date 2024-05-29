@@ -2,7 +2,7 @@
   "name": "AutoFill Forms",
   "description": "__MSG_description__",
   "default_locale": "en",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "manifest_version": 3,
   "permissions": [
     "scripting",
@@ -15,20 +15,20 @@
     "*://*/*"
   ],
   "action": {
-    "default_popup": "data/popup/index.html"
+    "default_popup": "/data/popup/index.html"
   },
   "background": {
     "service_worker": "bg/worker.js"
   },
   "homepage_url": "https://webextension.org/listing/autofill-forms.html",
   "icons": {
-    "16": "data/icons/16.png",
-    "32": "data/icons/32.png",
-    "48": "data/icons/48.png",
-    "64": "data/icons/64.png",
-    "128": "data/icons/128.png",
-    "256": "data/icons/256.png",
-    "512": "data/icons/512.png"
+    "16": "/data/icons/16.png",
+    "32": "/data/icons/32.png",
+    "48": "/data/icons/48.png",
+    "64": "/data/icons/64.png",
+    "128": "/data/icons/128.png",
+    "256": "/data/icons/256.png",
+    "512": "/data/icons/512.png"
   },
   "commands": {
     "_execute_action": {},
@@ -40,7 +40,7 @@
     }
   },
   "options_ui": {
-    "page": "data/options/index.html",
+    "page": "/data/options/index.html",
     "open_in_tab": true
   }
 }
