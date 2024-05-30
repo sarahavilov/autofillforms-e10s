@@ -81,6 +81,8 @@
         iconUrl: '/data/icons/48.png',
         title: 'AutoFill Forms',
         message
+      }, id => {
+        setTimeout(() => chrome.notifications.clear(id), 5000);
       });
     }
     else {
@@ -134,7 +136,7 @@
         inputs.add(e);
       }
     }
-    for (const e of target.querySelectorAll('input, textarea')) {
+    for (const e of target.querySelectorAll('input, textarea, select')) {
       if (utils.id(e) && types.test(e.type)) {
         inputs.add(e);
       }

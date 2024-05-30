@@ -15,7 +15,10 @@ const notify = (e, c = () => {}) => chrome.notifications.create({
   iconUrl: '/data/icons/48.png',
   title: chrome.runtime.getManifest().name,
   message: e.message || e
-}, c);
+}, id => {
+  setTimeout(() => chrome.notifications.clear(id), 5000);
+  c(id);
+});
 
 document.addEventListener('click', function(e) {
   const cmd = e.target.dataset.cmd;

@@ -253,9 +253,15 @@ chrome.storage.local.get({
         }
         else {
           const values = inputs.filter(input => founds.has(input)).map(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+              return {
+                name: decide(input),
+                value: input.checked ? input.value : ''
+              };
+            }
             return {
               name: decide(input),
-              value: (input.type === 'checkbox' || input.type === 'radio') ? (input.checked ? input.value : '') : input.value
+              value: input.value
             };
           }).filter(obj => defaults[obj.name] !== obj.value && profile[obj.name] !== obj.value);
 
