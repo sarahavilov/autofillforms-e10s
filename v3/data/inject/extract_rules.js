@@ -69,6 +69,7 @@ chrome.storage.local.get({
           });
         }
       }
+
       if (rules.length) {
         chrome.runtime.sendMessage({
           cmd: 'save-rules',

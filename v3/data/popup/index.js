@@ -136,3 +136,71 @@ document.addEventListener('keydown', e => {
     document.getElementById('create-profile').click();
   }
 });
+
+// permission
+chrome.storage.local.get({
+  'check.for.cross-origins': true
+}, prefs => {
+  if (prefs['check.for.cross-origins']) {
+    chrome.tabs.query({
+      active: true,
+      lastFocusedWindow: true
+    }, tabs => {
+      const tab = tabs[0];
+
+      chrome.scripting.executeScript({
+        target: {
+          tabId: tab.id,
+          allFrames: true
+        },
+        injectImmediately: true,
+        func: () => {
+          const hosts = [];
+          for (const frame of document.querySelectorAll('iframe')) {
+            if (frame.src && frame.src.startsWith('http')) {
+              try {
+                const origin = new URL(frame.src).hostname;
+                hosts.push(origin);
+              }
+              catch (e) {}
+            }
+          }
+          return hosts;
+        }
+      }).then(a => {
+        const hosts = new Set();
+        for (const {result} of a) {
+          for (const host of result) {
+            if (host) {
+              hosts.add(host);
+            }
+          }
+        }
+        const origins = [...hosts].map(s => '*://' + s + '/*');
+        if (origins.length) {
+          chrome.permissions.contains({
+            origins
+          }, b => {
+            if (b !== true) {
+              document.getElementById('permission').classList.remove('hidden');
+              document.querySelector('#permission span').textContent = [...hosts].join(', ');
+              document.querySelector('#permission').onsubmit = e => {
+                e.preventDefault();
+                chrome.permissions.request({
+                  origins
+                }, b => {
+                  if (b) {
+                    document.getElementById('permission').classList.add('hidden');
+                  }
+                });
+              };
+            }
+          });
+        }
+      }).catch(e => console.info('Cannot check frame access', e));
+    });
+  }
+});
+document.querySelector('#permission input[type=button]').onclick = () => {
+  document.getElementById('permission').classList.add('hidden');
+};

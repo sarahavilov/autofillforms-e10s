@@ -44,6 +44,7 @@ function save() {
   prefs['password.charset'] = document.getElementById('password.charset').value;
   prefs['password.length'] = +document.getElementById('password.length').value;
   prefs['detect'] = document.getElementById('detect').value;
+  prefs['check.for.cross-origins'] = document.getElementById('check.for.cross-origins').checked;
   // users
   prefs.users = [...document.querySelectorAll('#users option')]
     .map(e => e.value);
@@ -282,13 +283,15 @@ chrome.storage.local.get({
   'password.length': defaults['password.length'],
   'types': defaults.types,
   'detect': defaults.detect,
-  'rules': '{}'
+  'rules': '{}',
+  'check.for.cross-origins': true
 }, prefs => {
   // general
   document.getElementById('password.charset').value = prefs['password.charset'];
   document.getElementById('password.length').value = prefs['password.length'];
   document.getElementById('types').value = prefs.types;
   document.getElementById('detect').value = prefs.detect;
+  document.getElementById('check.for.cross-origins').checked = prefs['check.for.cross-origins'];
   // rename & delete
   disabled(prefs.current);
   // profile -> users

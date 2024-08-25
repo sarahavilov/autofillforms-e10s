@@ -3,6 +3,7 @@
   <meta charset="utf-8">
   <title>AutoFill Forms :: Options Page</title>
   <link rel="stylesheet" href="index.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body vbox>
   <div id="tabs">
@@ -18,15 +19,15 @@
           <col>
         </colgroup>
         <tr>
-          <td>Acceptable input types (<a target="_blank" data-href="faq14">RegExp</a>)</td>
+          <td><label for="types">Acceptable input types (<a target="_blank" data-href="faq14">RegExp</a>)</label></td>
           <td hbox><input type="text" id="types" flex=1></td>
         </tr>
         <tr>
-          <td>Password generation charset</td>
+          <td><label for="password.charset">Password generation charset</label></td>
           <td hbox><input type="text" id="password.charset" flex=1></td>
         </tr>
         <tr>
-          <td>Password generation length</td>
+          <td><label for="password.length">Password generation length</label></td>
           <td hbox><input type="text" id="password.length" flex=1></td>
         </tr>
         <tr>
@@ -40,11 +41,15 @@
           <td><input type="button" value="Export" data-cmd="export"></td>
         </tr>
         <tr>
+          <td><label for="check.for.cross-origins">Check for cross-origin frame access on popup interface</label></td>
+          <td><input type="checkbox" id="check.for.cross-origins"></td>
+        </tr>
+        <tr>
           <td>Cross-origin frames</td>
           <td><input type="button" value="Access" data-cmd="permission"></td>
         </tr>
         <tr>
-          <td>Element detection mode</td>
+          <td><label for="detect">Element detection mode</label></td>
           <td><select id="detect">
             <option value="body">Any Editable Element</option>
             <option value="forms">Form Elements</option>
@@ -54,7 +59,7 @@
     </div>
     <div data-index="2" data-active=true vbox flex=1>
       <div hbox align=center space=2 style="padding-bottom: 5px;">
-        Profile
+        <label for="users">Profile</label>
         <select id="users" flex=1></select>
         <input type="button" value="Duplicate" data-cmd="duplicate">
         <input type="button" value="Delete" data-cmd="delete" disabled="true">

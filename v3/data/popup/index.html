@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="fontello.css"/>
   <link rel="stylesheet" href="index.css"/>
 </head>
@@ -30,6 +31,13 @@
       <u>U</u>pdate Profile
     </button>
   </div>
+  <form id="permission" class="hidden">
+    The extension needs extra permission to fill forms on <span></span> frame(s). You can ignore this message if there is no need for filling on cross-origin frames.
+    <p>
+      <input type="button" value="Ignore">
+      <input type="submit" value="Proceed">
+    </p>
+  </form>
   <script src="external/fuse.js"></script>
   <script src="/bg/defaults.js"></script>
   <script src="/bg/utils.js"></script>

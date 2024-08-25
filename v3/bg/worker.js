@@ -6,10 +6,12 @@
 // https://www.quackit.com/html/html_editors/scratchpad/preview.cfm?example=/html/codes/html_form_code_with_bootstrap_grid_system
 // https://www.cognitoforms.com/FodMobiliteit1/AIRPORTMEDIATIONNL
 
-self.importScripts('defaults.js', 'utils.js');
+if (typeof importScripts !== 'undefined') {
+  self.importScripts('defaults.js', 'utils.js');
 
-self.importScripts('context.js');
-self.importScripts('fill.js');
+  self.importScripts('context.js');
+  self.importScripts('fill.js');
+}
 
 // inject
 chrome.runtime.onMessage.addListener((request, sender, response) => {
@@ -26,7 +28,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
   else if (request.cmd === 'extract-rules') {
     chrome.tabs.query({
       active: true,
-      currentWindow: true
+      lastFocusedWindow: true
     }, tabs => {
       tabs.forEach(async tab => {
         try {
@@ -37,6 +39,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
           // add rules to this hostname only?
           const [response] = await chrome.scripting.executeScript({
             target,
+            injectImmediately: true,
             func: hostname => confirm(`Only add rules for this hostname (${hostname})?`),
             args: [hostname]
           });
@@ -46,6 +49,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
               ...target,
               allFrames: true
             },
+            injectImmediately: true,
             func: h => self.hostname = h,
             args: [response.result ? hostname : '']
           });
@@ -55,6 +59,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
               ...target,
               allFrames: true
             },
+            injectImmediately: true,
             files: ['/bg/defaults.js']
           });
           await chrome.scripting.executeScript({
@@ -62,6 +67,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
               ...target,
               allFrames: true
             },
+            injectImmediately: true,
             files: ['/bg/utils.js']
           });
           await chrome.scripting.executeScript({
@@ -69,6 +75,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
               ...target,
               allFrames: true
             },
+            injectImmediately: true,
             files: ['/data/inject/extract_rules.js']
           });
         }
@@ -83,7 +90,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
   else if (request.cmd === 'create-profile') {
     chrome.tabs.query({
       active: true,
-      currentWindow: true
+      lastFocusedWindow: true
     }, tabs => {
       tabs.forEach(async tab => {
         try {
@@ -92,6 +99,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
             target: {
               tabId: tab.id
             },
+            injectImmediately: true,
             func: profile => prompt('Select a name for your new profile or use an old name to update existing profile', profile),
             args: [request.profile]
           });
@@ -104,6 +112,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
             // inject response variable to content script
             await chrome.scripting.executeScript({
               target,
+              injectImmediately: true,
               func: profile => {
                 self.current = profile;
                 self.mode = 'retrieve';
@@ -112,14 +121,17 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
             });
             await chrome.scripting.executeScript({
               target,
+              injectImmediately: true,
               files: ['/bg/defaults.js']
             });
             await chrome.scripting.executeScript({
               target,
+              injectImmediately: true,
               files: ['/bg/utils.js']
             });
             await chrome.scripting.executeScript({
               target,
+              injectImmediately: true,
               files: ['/data/inject/fill.js']
             });
           }
@@ -203,8 +215,7 @@ const lazySave = {
 {
   const {management, runtime: {onInstalled, setUninstallURL, getManifest}, storage, tabs} = chrome;
   if (navigator.webdriver !== true) {
-    const page = getManifest().homepage_url;
-    const {name, version} = getManifest();
+    const {homepage_url: page, name, version} = getManifest();
     onInstalled.addListener(({reason, previousVersion}) => {
       management.getSelf(({installType}) => installType === 'normal' && storage.local.get({
         'faqs': true,
@@ -213,7 +224,7 @@ const lazySave = {
         if (reason === 'install' || (prefs.faqs && reason === 'update')) {
           const doUpdate = (Date.now() - prefs['last-update']) / 1000 / 60 / 60 / 24 > 45;
           if (doUpdate && previousVersion !== version) {
-            tabs.query({active: true, currentWindow: true}, tbs => tabs.create({
+            tabs.query({active: true, lastFocusedWindow: true}, tbs => tabs.create({
               url: page + '?version=' + version + (previousVersion ? '&p=' + previousVersion : '') + '&type=' + reason,
               active: reason === 'install',
               ...(tbs && tbs.length && {index: tbs[0].index + 1})
