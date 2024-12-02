@@ -112,36 +112,67 @@
   };
 
 
-  utils.id = e => {
-    // if multiple inputs have the same name but different ids, use id for the reset
-    try {
-      const name = e.name;
-      if (name) {
-        const m = (e.closest('form') || document.body).querySelector(`[name="${name}"]`);
-        if (m && m !== e) {
-          const altID = e.id || e.placeholder.replace(/\s/g, '_');
-          if (altID) {
-            return altID;
-          }
-        }
-      }
-    }
-    catch (e) {}
 
-    return e.name || e.id || e.placeholder.replace(/\s/g, '_');
-  };
-  utils.inputs = (target, inputs, types) => {
-    for (const e of target.querySelectorAll('[name]')) {
-      if (types.test(e.type)) {
-        inputs.add(e);
-      }
-    }
-    for (const e of target.querySelectorAll('input, textarea, select')) {
-      if (utils.id(e) && types.test(e.type)) {
-        inputs.add(e);
-      }
-    }
-  };
+    utils.id = (e) => {
+        // if multiple inputs have the same name but different ids, use id for the reset
+        try {
+            // Check for data-automation-id first
+            if (e.getAttribute("data-automation-id")) {
+                const name = e.getAttribute("data-automation-id") || e.name;
+                if (name) {
+                    const m = (
+                        e.closest("form") || document.body
+                    ).querySelector(`[data-automation-id="${name}"]`);
+                    if (m && m !== e) {
+                        // Try data-automation-id first, then fallback to id or placeholder
+                        const altID =
+                            e.getAttribute("data-automation-id") ||
+                            e.id ||
+                            e.placeholder.replace(/\s/g, "_");
+                        if (altID) {
+                            return altID;
+                        }
+                    }
+                }
+            }
+            // Return in order of priority: data-automation-id > name > id > placeholder
+
+            const name = e.name;
+            if (name) {
+                const m = (e.closest("form") || document.body).querySelector(
+                    `[name="${name}"]`,
+                );
+                if (m && m !== e) {
+                    const altID = e.id || e.placeholder.replace(/\s/g, "_");
+                    if (altID) {
+                        return altID;
+                    }
+                }
+            }
+        } catch (e) {}
+        return (
+            e.getAttribute("data-automation-id") ||
+            e.name ||
+            e.id ||
+            e.placeholder.replace(/\s/g, "_")
+        );
+    };
+    utils.inputs = (target, inputs, types) => {
+        for (const e of target.querySelectorAll(
+            "[data-automation-id], [name]",
+        )) {
+            if (types.test(e.type)) {
+                inputs.add(e);
+            }
+        }
+
+        for (const e of target.querySelectorAll("input, textarea, select")) {
+            if (utils.id(e) && types.test(e.type)) {
+                inputs.add(e);
+            }
+        }
+    };
 }
+
 // eslint-disable-next-line semi
 '' // Firefox cloning issue
