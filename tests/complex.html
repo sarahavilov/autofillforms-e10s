@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sample Form</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue",Helvetica,sans-serif;
+      font-size: 13px;
+    }
+    iframe {
+      width: 300px;
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+  <form>
+    <h3>type=text</h3>
+    <div>
+      First name: <input type="text" name="firstname">
+    </div>
+    <div>
+      Last name: <input type="text" name="lastname">
+    </div>
+
+    <h3>type=radio</h3>
+    <input type="radio" name="gender" value="male" checked> Male<br>
+    <input type="radio" name="gender" value="female"> Female<br>
+    <input type="radio" name="gender" value="other"> Other
+    <h3>type=premiere_checkbox</h3>
+    <label><input name="browser" type="checkbox" id="cbox1" value="firefox"> firefox</label><br>
+    <label><input name="browser" type="checkbox" id="cbox1" value="chrome"> chrome</label>
+    <h3>type=select</h3>
+    <select name="car">
+      <option value="volvo">Volvo</option>
+      <option value="saab">Saab</option>
+      <option value="opel">Opel</option>
+      <option value="audi">Audi</option>
+    </select>
+  </form>
+  <iframe src="iframe.html"></iframe>
+</body>
+</html>

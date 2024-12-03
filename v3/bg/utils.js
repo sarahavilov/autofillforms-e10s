@@ -113,20 +113,42 @@
 
 
   utils.id = e => {
-    // if multiple inputs have the same name but different ids, use id for the reset
-    try {
-      const name = e.name;
-      if (name) {
-        const m = (e.closest('form') || document.body).querySelector(`[name="${name}"]`);
-        if (m && m !== e) {
-          const altID = e.id || e.placeholder.replace(/\s/g, '_');
-          if (altID) {
-            return altID;
+    const checks = ['name', 'id', 'value']; // order is important
+    const root = e.closest('form') || document.body;
+
+    // match based on the first distinguishable property
+    for (let n = 0; n < checks.length; n += 1) {
+      const check = checks[n];
+      try {
+        let v;
+        if (check === 'value') {
+          if (e.type && ['radio', 'checkbox', 'select-one', 'select-multiple'].includes(e.type)) {
+            return e.value;
+          }
+        }
+        else {
+          v = e.getAttribute(check);
+        }
+        if (v) {
+          const m = root.querySelector(`[${check}="${v}"]`);
+          if (m === e) {
+            return v;
           }
         }
       }
+      catch (e) {}
     }
-    catch (e) {}
+
+    if (e.placeholder) {
+      return e.placeholder.replace(/\s/g, '_');
+    }
+
+    for (const check of checks) {
+      const v = e.getAttribute(check);
+      if (v) {
+        return v;
+      }
+    }
 
     return e.name || e.id || e.placeholder.replace(/\s/g, '_');
   };
