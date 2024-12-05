@@ -83,7 +83,7 @@ chrome.storage.local.get({
   if (mode === 'retrieve') {
     inputs = inputs.filter(input => {
       if (input.type === 'radio') {
-        return input.checked;
+        return true;
       }
       else if (input.type === 'checkbox') {
         return true; // so that we can update unchecked inputs too
@@ -96,20 +96,19 @@ chrome.storage.local.get({
 
   // append a new rule name to findings
   const append = (input, name, regexp, certainty = 1) => {
+    // add more value to user-defined rules
     const a = founds.get(input);
+    const v = {
+      name,
+      regexp,
+      certainty,
+      default: name in defaults.rules
+    };
     if (a) {
-      a.push({
-        name,
-        regexp,
-        certainty
-      });
+      a.push(v);
     }
     else {
-      founds.set(input, [{
-        name,
-        regexp,
-        certainty
-      }]);
+      founds.set(input, [v]);
     }
   };
   // decide the best matching name for a finding
@@ -140,6 +139,7 @@ chrome.storage.local.get({
         // preparing rule list
         const rules = Object.keys(prefs.rules).filter(name => {// filter rules that match this domain
           const r = new RegExp(prefs.rules[name]['site-rule'], 'i');
+
           return r.test(response);
         }).reverse() // prioritizing user-defined rules
           .map(name => Object.assign(prefs.rules[name], {name}));
@@ -198,15 +198,24 @@ chrome.storage.local.get({
 
         // fill values
         if (mode === 'insert') {
-          inputs.filter(input => founds.has(input)).forEach(element => {
-            let value = profile[decide(element)] || '';
+          const ii = inputs.filter(input => founds.has(input));
+
+          ii.forEach(element => {
+            let value = profile[decide(element)] ?? '';
+
+            console.log(value, decide(element), element, profile);
 
             if (element.type === 'radio') {
-              if (
-                element.value.toLowerCase() === value.toLowerCase() ||
-                element.textContent.toLowerCase() === value.toLowerCase()
-              ) {
-                element.click();
+              if (value === true || value === false) {
+                element.checked = value;
+              }
+              else if (typeof value === 'string') {
+                if (
+                  element.value.toLowerCase() === value.toLowerCase() ||
+                  element.textContent.toLowerCase() === value.toLowerCase()
+                ) {
+                  element.click();
+                }
               }
             }
             else if (element.type === 'checkbox') {
@@ -253,17 +262,37 @@ chrome.storage.local.get({
         }
         else {
           const values = inputs.filter(input => founds.has(input)).map(input => {
-            if (input.type === 'checkbox' || input.type === 'radio') {
+            if (input.type === 'checkbox') {
               return {
                 name: decide(input),
-                value: input.checked ? input.value : ''
+                value: input.checked
+              };
+            }
+            else if (input.type === 'radio') {
+              return {
+                name: decide(input),
+                value: input.checked
               };
             }
             return {
               name: decide(input),
               value: input.value
             };
-          }).filter(obj => defaults[obj.name] !== obj.value && profile[obj.name] !== obj.value);
+          }).filter(obj => {
+            console.log(obj);
+
+            if (obj.name in defaults.profile) {
+              if (defaults.profile[obj.name] === obj.value) {
+                return false;
+              }
+            }
+            if (obj.name in profile) {
+              if (profile[obj.name] === obj.value) {
+                return false;
+              }
+            }
+            return true;
+          });
 
           if (values.length || current !== prefs.current) {
             chrome.runtime.sendMessage({
