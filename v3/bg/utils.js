@@ -113,7 +113,7 @@
 
 
   utils.id = e => {
-    const checks = ['data-automation-id','name', 'id', 'value']; // order is important
+    const checks = ['data-automation-id', 'name', 'id', 'value']; // order is important
     const root = e.closest('form') || document.body;
 
     // match based on the first distinguishable property
@@ -150,29 +150,27 @@
       }
     }
 
-      return (
-        e.getAttribute("data-automation-id") ||
-        e.name ||
-        e.id ||
-        e.placeholder.replace(/\s/g, "_")
-      );
-    };
-    utils.inputs = (target, inputs, types) => {
-      for (const e of target.querySelectorAll(
-        "[data-automation-id], [name]",
-      )) {
-        if (types.test(e.type)) {
-          inputs.add(e);
-        }
+    return (
+      e.getAttribute('data-automation-id') ||
+      e.name ||
+      e.id ||
+      e.placeholder.replace(/\s/g, '_')
+    );
+  };
+  utils.inputs = (target, inputs, types) => {
+    for (const e of target.querySelectorAll('[data-automation-id], [name]')) {
+      if (types.test(e.type)) {
+        inputs.add(e);
       }
+    }
 
-      for (const e of target.querySelectorAll("input, textarea, select")) {
-        if (utils.id(e) && types.test(e.type)) {
-          inputs.add(e);
-        }
+    for (const e of target.querySelectorAll('input, textarea, select')) {
+      if (utils.id(e) && types.test(e.type)) {
+        inputs.add(e);
       }
-    };
-  }
+    }
+  };
+}
 
-  // eslint-disable-next-line semi
-  '' // Firefox cloning issue
+// eslint-disable-next-line semi
+'' // Firefox cloning issue
