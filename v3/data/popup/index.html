@@ -21,15 +21,25 @@
     <input type="search" id="search" placeholder="Find a Profile. Press Enter to Fill" autofocus>
   </form>
   <div id="tools">
-    <button id="generate-password" title="Generate a random password (Ctrl + G or Command + G)">
+    <button id="generate-password" title="Generate a random password (Access Keys + G)" accesskey="g">
       <u>G</u>enerate a Password
     </button>
-    <button id="extract-rules" title="Extract all possible rules from current page (Ctrl + E or Command + E)">
+    <button id="extract-rules" title="Extract all possible rules from current page (Access Keys + E)" accesskey="e">
       <u>E</u>xtract Rules
     </button>
-    <button id="create-profile" title="Create a new profile or update existing profile from data inserted in the page based on the known rules (Ctrl + U or Command + U)">
+    <button id="create-profile" title="Create a new profile or update existing profile from data inserted in the page based on the known rules (Access Keys + U)" accesskey="u">
       <u>U</u>pdate Profile
     </button>
+  </div>
+  <div id="clipboard">
+    <span title="This section is useful to temporarly store data from the current tab and paste it multiple times during the current session without storing in profiles">This Tab:</span>
+    <button id="create-tmp-profile" title="Create a temporary profile from data inserted in the page based on the known rules (Access Keys + C)" accesskey="c">
+      <u>C</u>opy Data
+    </button>
+    <button id="fill-with-tmp-profile" title="Fill froms from the previously stored data (Ctrl + P or Command + P)" accesskey="p">
+      <u>P</u>aste Date
+    </button>
+
   </div>
   <form id="permission" class="hidden">
     The extension needs extra permission to fill forms on <span></span> frame(s). You can ignore this message if there is no need for filling on cross-origin frames.

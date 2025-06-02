@@ -135,7 +135,9 @@ chrome.storage.local.get({
     chrome.runtime.sendMessage({
       cmd: 'get-url'
     }, response => {
-      utils.getProfile(prefs.current, profile => {
+      console.log(123, self.profile);
+
+      utils.getProfile(self.profile || prefs.current, profile => {
         // preparing rule list
         const rules = Object.keys(prefs.rules).filter(name => {// filter rules that match this domain
           const r = new RegExp(prefs.rules[name]['site-rule'], 'i');

@@ -87,7 +87,7 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
     });
     return false;
   }
-  else if (request.cmd === 'create-profile') {
+  else if (request.cmd === 'create-profile' || request.cmd === 'create-tmp-profile') {
     chrome.tabs.query({
       active: true,
       lastFocusedWindow: true
@@ -95,7 +95,9 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
       tabs.forEach(async tab => {
         try {
           // ask for profile name
-          const [response] = await chrome.scripting.executeScript({
+          const [response] = request.cmd === 'create-tmp-profile' ? [{
+            result: 'tmp::' + tab.id
+          }] : await chrome.scripting.executeScript({
             target: {
               tabId: tab.id
             },
@@ -152,6 +154,11 @@ chrome.runtime.onMessage.addListener((request, sender, response) => {
     clearTimeout(lazySave.rules.id);
     lazySave.rules.id = setTimeout(lazySave.rules.save, 500);
   }
+  else if (request.cmd === 'read.session.storage') {
+    chrome.storage.session.get(request.prefs, response);
+
+    return true;
+  }
 });
 
 const lazySave = {
@@ -168,20 +175,26 @@ const lazySave = {
           p[c.name] = c.value;
           return p;
         }, lazySave.profile.cache[0].profile);
+
       const current = lazySave.profile.cache[0].current;
       const users = lazySave.profile.cache[0].users;
 
       utils.storeProfile(current, profile, () => {
-        utils.addUser(current, users, () => {
-          chrome.storage.local.set({
-            current
-          }, () => {
-            if (values.length) {
-              utils.notify(`${values.length} values is added or updated for "${current}" profile.`);
-            }
-            lazySave.profile.cache = [];
+        if (current.includes('tmp::')) {
+          lazySave.profile.cache = [];
+        }
+        else {
+          utils.addUser(current, users, () => {
+            chrome.storage.local.set({
+              current
+            }, () => {
+              if (values.length) {
+                utils.notify(`${values.length} values is added or updated for "${current}" profile.`);
+              }
+              lazySave.profile.cache = [];
+            });
           });
-        });
+        }
       });
     }
   },

@@ -49,7 +49,7 @@ chrome.runtime.onInstalled.addListener(() => setTimeout(build, 500));
 chrome.runtime.onStartup.addListener(() => setTimeout(build, 500));
 chrome.storage.onChanged.addListener(prefs => {
   if (prefs.current) {
-    build(prefs.current);
+    build(prefs.current.newValue);
   }
   if (Object.keys(prefs).filter(n => n.startsWith('profile-')).length) {
     build();

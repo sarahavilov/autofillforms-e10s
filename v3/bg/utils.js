@@ -7,17 +7,31 @@
     if (name) {
       const pname = 'profile-' + name;
       const ename = 'profile-' + name + '-exceptions';
-      chrome.storage.local.get({
-        [pname]: '{}',
-        [ename]: '[]'
-      }, apfs => {
+
+      const next = apfs => {
         let profile = JSON.parse(apfs[pname]);
         const exceptions = JSON.parse(apfs[ename]);
         profile = Object.assign({}, defaults.profile, profile);
         exceptions.forEach(name => delete profile[name]);
 
         callback(profile);
-      });
+      };
+
+      if (name.includes('tmp::')) {
+        chrome.runtime.sendMessage({
+          cmd: 'read.session.storage',
+          prefs: {
+            [pname]: '{}',
+            [ename]: '[]'
+          }
+        }, next);
+      }
+      else {
+        chrome.storage.local.get({
+          [pname]: '{}',
+          [ename]: '[]'
+        }, next);
+      }
     }
     else {
       chrome.storage.local.get({
@@ -39,7 +53,7 @@
         }, {})
       )
     };
-    chrome.storage.local.set(prefs, callback);
+    chrome.storage[name && name.includes('tmp::') ? 'session' : 'local'].set(prefs, callback);
   };
 
   utils.getUsers = sUsers => sUsers.split(', ').concat('default').filter(n => n);

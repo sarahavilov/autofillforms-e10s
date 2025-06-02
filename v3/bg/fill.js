@@ -1,6 +1,6 @@
 /* global utils */
 
-const onCommand = () => chrome.tabs.query({
+const onCommand = cmd => chrome.tabs.query({
   active: true,
   currentWindow: true
 }, tabs => {
@@ -12,7 +12,17 @@ const onCommand = () => chrome.tabs.query({
     try {
       await chrome.scripting.executeScript({
         target,
-        func: () => self.mode = 'insert'
+        func: name => {
+          // temporary profile
+          if (name) {
+            self.profile = name;
+          }
+          else {
+            delete self.profile;
+          }
+          self.mode = 'insert';
+        },
+        args: [cmd === 'fill-tmp-forms' ? 'tmp::' + tab.id : null]
       });
       await chrome.scripting.executeScript({
         target,
@@ -38,7 +48,7 @@ const onCommand = () => chrome.tabs.query({
 });
 chrome.commands.onCommand.addListener(onCommand);
 chrome.runtime.onMessage.addListener(request => {
-  if (request.cmd === 'fill-forms') {
-    onCommand();
+  if (request.cmd === 'fill-forms' || request.cmd === 'fill-tmp-forms') {
+    onCommand(request.cmd);
   }
 });

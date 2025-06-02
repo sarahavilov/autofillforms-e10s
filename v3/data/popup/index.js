@@ -95,12 +95,17 @@ document.getElementById('filling').addEventListener('submit', e => {
 
   post('fill-forms');
 });
+document.getElementById('fill-with-tmp-profile').onclick = () => post('fill-tmp-forms');
 
 // Extract Rules
 document.getElementById('extract-rules').onclick = () => post('extract-rules');
 
 // Update Profile
 document.getElementById('create-profile').onclick = () => post('create-profile');
+document.getElementById('create-tmp-profile').onclick = () => post('create-tmp-profile');
+
+//
+document.getElementById('update-profile').onclick = () => post('update-profile');
 
 // generate password
 document.getElementById('generate-password').onclick = () => chrome.storage.local.get({
@@ -117,24 +122,6 @@ document.getElementById('generate-password').onclick = () => chrome.storage.loca
     });
     chrome.runtime.lastError;
   }).catch(e => notify(e));
-});
-
-// keypress
-document.addEventListener('keydown', e => {
-  const meta = e.ctrlKey || e.metaKey;
-
-  if (e.code === 'KeyG' && meta) {
-    e.preventDefault();
-    document.getElementById('generate-password').click();
-  }
-  else if (e.code === 'KeyE' && meta) {
-    e.preventDefault();
-    document.getElementById('extract-rules').click();
-  }
-  else if (e.code === 'KeyU' && meta) {
-    e.preventDefault();
-    document.getElementById('create-profile').click();
-  }
 });
 
 // permission

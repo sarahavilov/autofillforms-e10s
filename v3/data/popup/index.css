@@ -1,6 +1,7 @@
 :root {
   --bg: #f8f8f8;
   --bg-dark: #d8d8d8;
+  --bg-border: #d8d8d8;
   --fg: #000;
   --bg-bug: #edb700;
   --bg-settings: #3c81e7;
@@ -13,6 +14,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-dark: #202124;
+    --bg-border: #5b5b5b;
     --bg: #292a2d;
     --fg: #ccd0d3;
     --bg-bug: #5d4800;
@@ -138,7 +140,7 @@ button * {
   height: 34px;
   text-align: center;
   border-top: none;
-  -webkit-appearance: none;
+  appearance: none;
   font-style: italic;
   background-color: var(--bg-dark);
 }
@@ -148,23 +150,35 @@ button * {
   white-space: nowrap;
 }
 
-#tools {
+#tools,
+#clipboard {
   display: grid;
   flex-direction: row;
   grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1px;
 }
+#clipboard > button,
 #tools > button {
   padding: 10px;
   font-size: 12px;
+  cursor: pointer;
   position: relative;
 }
-#tools > button:not(:last-child)::after {
+#clipboard > button:hover,
+#tools > button:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+}
+#tools > button:not(:last-child)::after,
+#clipboard > button:not(:last-child)::after {
   content: '';
   position: absolute;
-  right: 0;
+  right: -1px;
   width: 1px;
   height: 14px;
-  background-color: var(--bg-dark);
+  background-color: var(--bg-border) !important;
+}
+#clipboard > span {
+  place-self: center;
 }
 
 #permission {
