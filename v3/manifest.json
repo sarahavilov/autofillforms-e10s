@@ -2,7 +2,7 @@
   "name": "AutoFill Forms",
   "description": "__MSG_description__",
   "default_locale": "en",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "manifest_version": 3,
   "permissions": [
     "scripting",

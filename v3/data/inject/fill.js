@@ -203,8 +203,6 @@ chrome.storage.local.get({
           ii.forEach(element => {
             let value = profile[decide(element)] ?? '';
 
-            console.log(value, decide(element), element, profile);
-
             if (element.type === 'radio') {
               if (value === true || value === false) {
                 element.checked = value;
