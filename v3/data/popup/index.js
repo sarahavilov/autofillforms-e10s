@@ -104,9 +104,6 @@ document.getElementById('extract-rules').onclick = () => post('extract-rules');
 document.getElementById('create-profile').onclick = () => post('create-profile');
 document.getElementById('create-tmp-profile').onclick = () => post('create-tmp-profile');
 
-//
-document.getElementById('update-profile').onclick = () => post('update-profile');
-
 // generate password
 document.getElementById('generate-password').onclick = () => chrome.storage.local.get({
   'password.charset': 'qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM1234567890',

@@ -17,6 +17,7 @@
         callback(profile);
       };
 
+      // since this is called inside page and chrome does not allow chrome.storage.session on the page context
       if (name.includes('tmp::')) {
         chrome.runtime.sendMessage({
           cmd: 'read.session.storage',
@@ -173,12 +174,18 @@
   };
   utils.inputs = (target, inputs, types) => {
     for (const e of target.querySelectorAll('[data-automation-id], [name]')) {
+      if (e.disabled || e.readOnly) {
+        continue;
+      }
       if (types.test(e.type)) {
         inputs.add(e);
       }
     }
 
     for (const e of target.querySelectorAll('input, textarea, select')) {
+      if (e.disabled || e.readOnly) {
+        continue;
+      }
       if (utils.id(e) && types.test(e.type)) {
         inputs.add(e);
       }
