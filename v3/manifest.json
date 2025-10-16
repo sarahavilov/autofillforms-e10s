@@ -55,5 +55,9 @@
       "id": "jid1-jJjr0f2lg5yYtf2dD@jetpack",
       "strict_min_version": "128.0"
     }
+    "gecko_android": {
+      "strict_min_version": "128.0"
+    }
   }
 }
+
