@@ -66,15 +66,15 @@
         <input type="button" value="Rename" data-cmd="rename" disabled="true">
         <input type="text" placeholder="new name" id="rename">
       </div>
-      <div flex=1 style="overflow: auto;" hbox id="profile">
+      <div flex=1 style="overflow: auto; align-items: start;" hbox id="profile">
         <template>
           <tr>
-            <td><input type="text" value="" placeholder="mandatory"></td>
-            <td><input type="text" value="" placeholder="mandatory"></td>
+            <td><input type="text" value="" placeholder="name"></td>
+            <td><input type="text" value="" placeholder="value"></td>
             <td><input type="button" value="x" data-cmd="delete-row"></td>
           </tr>
         </template>
-        <table class=editable flex=1>
+        <table class=editable>
           <colgroup>
             <col width="100"></col>
             <col></col>

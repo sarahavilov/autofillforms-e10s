@@ -112,23 +112,24 @@ chrome.storage.local.get({
     }
   };
   // decide the best matching name for a finding
-  const decide = input => {
-    const a = founds.get(input);
-    const max = Math.max(...a.map(o => o.certainty));
-    const b = a.filter(o => o.certainty === max);
+  const decide = (input, certainty = 0) => {
+    const a = founds.get(input).filter(o => o.certainty >= certainty);
 
-    const name = utils.id(input);
+    if (a.length) {
+      const max = Math.max(...a.map(o => o.certainty));
+      const b = a.filter(o => o.certainty === max);
 
-    b.sort((m, n) => {
-      try {
-        return n.regexp.exec(name)[0].length - m.regexp.exec(name)[0].length;
-      }
-      catch (e) {
-        return 0;
-      }
-    });
+      b.sort((m, n) => {
+        try {
+          return n.regexp.exec(name)[0].length - m.regexp.exec(name)[0].length;
+        }
+        catch (e) {
+          return 0;
+        }
+      });
 
-    return b[0].name;
+      return b[0].name;
+    }
   };
 
   if (inputs.length) {
@@ -201,7 +202,18 @@ chrome.storage.local.get({
           const ii = inputs.filter(input => founds.has(input));
 
           ii.forEach(element => {
-            let value = profile[decide(element)] ?? '';
+            // only fill if something meaningful is found
+            const d = decide(element, 0.2);
+            let value = profile[d];
+
+            // do not fill if not found (#84)
+            if (!value) {
+              return;
+            }
+
+            if (value === '[blank]') {
+              value = '';
+            }
 
             if (element.type === 'radio') {
               if (value === true || value === false) {
@@ -277,8 +289,6 @@ chrome.storage.local.get({
               value: input.value
             };
           }).filter(obj => {
-            console.log(obj);
-
             if (obj.name in defaults.profile) {
               if (defaults.profile[obj.name] === obj.value) {
                 return false;

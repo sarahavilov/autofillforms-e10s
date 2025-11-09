@@ -25,11 +25,10 @@ function syncProfile(name) {
   profiles[name] = [...document.querySelectorAll('#profile tbody tr')].map(tr => ({
     name: tr.querySelector('td:nth-child(1) input').value,
     value: tr.querySelector('td:nth-child(2) input').value
-  })).filter(obj => obj.name !== '' && obj.value !== '')
-    .reduce((p, c) => {
-      p[c.name] = c.value;
-      return p;
-    }, {});
+  })).filter(obj => obj.name !== '').reduce((p, c) => {
+    p[c.name] = c.value || '[blank]';
+    return p;
+  }, {});
 }
 
 function disabled(current) {
